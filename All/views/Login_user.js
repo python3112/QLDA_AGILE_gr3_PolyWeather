@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text  ,Image} from "react-native";
 
 const LoginScreen = (props) => {
     return (
         <View style={styles.container}>
+            <Image style={{width:100, height:100}} source={require('../image/logoCloud.png')}/>
+
+           
             <Text style={styles.Text}>
-                hoàng t
+               Poly Weather
             </Text>
 
 
@@ -25,7 +28,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
-        color:'black',
+        backgroundColor:'#1D957F61'
        
     }
 
