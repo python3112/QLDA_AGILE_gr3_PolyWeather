@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0, 40, 0, 0.5)',
+       
     }
 
 });
