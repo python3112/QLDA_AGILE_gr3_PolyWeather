@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Text, Image, TextInput, ImageBackground } from "react-native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {useNavigation} from '@react-navigation/native'
 
 const LoginScreen = (props) => {
+    const navigation = useNavigation();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
@@ -15,6 +17,9 @@ const LoginScreen = (props) => {
             <View style={styles.container}>
 
                 <Image style={{ width: 150, height: 150 }} source={require('../image/logoWeather.png')} />
+                <Text style={{fontSize:25, marginBottom:10,color:'white'  , letterSpacing:0.5,fontWeight:'bold'}}>
+                    Đăng Nhập Poly Weather
+                </Text>
                 {/* /////////////// phần text input đăng nhập vào /////////// */}
                 <View style={styles.viewTip} >
                     <View style={styles.tipUserNameContainer}>
@@ -49,7 +54,7 @@ const LoginScreen = (props) => {
 
                 {/* /////////////// btn login ///////////////// */}
 
-                <TouchableOpacity style={styles.btn_Login}>
+                <TouchableOpacity style={styles.btn_Login} onPress={() => {navigation.navigate('signup')}} >
                     <Text style={{
                         color: "white",
                         alignSelf: 'center',
