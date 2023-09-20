@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { Image, SafeAreaView, StyleSheet, Text} from 'react-native';
+import {useNavigation} from '@react-navigation/native'
 
-const Splash_screen = ({navigation}) => {
+const Splash_screen = (props) => {
+  const navigation = useNavigation();
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('Đăng nhập'); 
+      navigation.navigate('login'); 
     }, 3000);
 
     return () => clearTimeout(timer); 
