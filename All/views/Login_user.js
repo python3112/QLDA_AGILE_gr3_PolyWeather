@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   logoLogin: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     marginTop: 20,
   },
 
