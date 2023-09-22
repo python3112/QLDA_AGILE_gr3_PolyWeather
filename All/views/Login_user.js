@@ -82,6 +82,7 @@ const LoginScreen = (props) => {
         </TouchableOpacity>
         
         {/* Đăng nhặp bằng Facebook và Google */}
+        {/* View text */}
         <View style={styles.loginWithOtherAccount}>
           <View style={styles.lineBlack}>
             <View
@@ -100,14 +101,16 @@ const LoginScreen = (props) => {
               }}
             />
           </View>
-          {/* ////////////////// logo đăng nhập bằng google hoặc phở bò /////////////// */}
+
           <View style={styles.logoLogin}>
+          {/* Button Facebook*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
                 style={{ width: 50, height: 50 }}
                 source={require("../image/logoFB.png")}
               />
             </TouchableOpacity>
+          {/* Button Google*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
                 style={{ width: 50, height: 50 }}
@@ -115,6 +118,12 @@ const LoginScreen = (props) => {
               />
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={styles.containerSignUp}>
+          <Text style={styles.textSignUp}>Not register yet?</Text>
+          <TouchableOpacity>
+          <Text style={styles.textBtnSignUp}>Create account</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -239,4 +248,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
   },
+  containerSignUp:{
+    marginTop:100,
+    flexDirection:'row',
+    alignItems:'center'
+  },
+  textSignUp:{
+    color:'grey',
+    fontSize:16,
+    marginEnd:5
+  },
+  textBtnSignUp:{
+    fontSize:16,
+    marginEnd:5,
+    fontWeight:'500'
+  }
+
 });
