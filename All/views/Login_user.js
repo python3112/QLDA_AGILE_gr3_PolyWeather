@@ -20,9 +20,7 @@ const LoginScreen = (props) => {
   const [visModel, setvisModel] = useState(true);
   const [showPass, setShowPass] = useState(false);
 
-const LoginWithAccFirebase = () => {
 
-}
 
 
 
