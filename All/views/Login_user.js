@@ -129,14 +129,14 @@ const LoginWithAccFirebase = () => {
           </View>
         </View>
       </View>
-<<<<<<< HEAD
+
 
       {/* <Modal animationType="slide" transparent={true} visible={visModel}>
               <View>
                 <Text>Đăng Nhập </Text>
               </View>
       </Modal> */}
-=======
+
       <View style={styles.containerSignUp}>
           <Text style={styles.textSignUp}>Not register yet?</Text>
           <TouchableOpacity onPress={() => {
@@ -145,7 +145,7 @@ const LoginWithAccFirebase = () => {
           <Text style={styles.textBtnSignUp}>Create account</Text>
           </TouchableOpacity>
         </View>
->>>>>>> ee6e034eb956432dcdc0d5d8997e9c8d7dc312bc
+
     </View>
 
 
