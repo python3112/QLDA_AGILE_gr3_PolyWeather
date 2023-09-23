@@ -84,13 +84,14 @@ const LoginWithAccFirebase = () => {
         <TouchableOpacity
           style={styles.btnLogin}
           onPress={() => {
-            navigation.navigate("signup");
+            navigation.navigate("home");
           }}
         >
           <Text style={styles.textBtnLogin}>Login</Text>
         </TouchableOpacity>
         
         {/* Đăng nhặp bằng Facebook và Google */}
+        {/* View text */}
         <View style={styles.loginWithOtherAccount}>
           <View style={styles.lineBlack}>
             <View
@@ -109,29 +110,42 @@ const LoginWithAccFirebase = () => {
               }}
             />
           </View>
-          {/* ////////////////// logo đăng nhập bằng google hoặc phở bò /////////////// */}
+
           <View style={styles.logoLogin}>
+          {/* Button Facebook*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
-                style={{ width: 50, height: 50 }}
+                style={styles.logoOthers}
                 source={require("../image/logoFB.png")}
               />
             </TouchableOpacity>
+          {/* Button Google*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
-                style={{ width: 50, height: 50 }}
+                style={styles.logoOthers}
                 source={require("../image/logoGG.png")}
               />
             </TouchableOpacity>
           </View>
         </View>
       </View>
+<<<<<<< HEAD
 
       {/* <Modal animationType="slide" transparent={true} visible={visModel}>
               <View>
                 <Text>Đăng Nhập </Text>
               </View>
       </Modal> */}
+=======
+      <View style={styles.containerSignUp}>
+          <Text style={styles.textSignUp}>Not register yet?</Text>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate("signup");
+          }}>
+          <Text style={styles.textBtnSignUp}>Create account</Text>
+          </TouchableOpacity>
+        </View>
+>>>>>>> ee6e034eb956432dcdc0d5d8997e9c8d7dc312bc
     </View>
 
 
@@ -256,7 +270,30 @@ const styles = StyleSheet.create({
     height: 50,
     marginEnd: 20,
     marginStart: 20,
-    borderRadius: 12,
+    borderRadius: 25,
     justifyContent: "center",
+    alignItems:'center',
+    backgroundColor:'#C0C0C0',
   },
+  logoOthers:{
+    width: 40,
+    height: 40,
+  },
+  containerSignUp:{
+    position:'absolute',
+    bottom:20,
+    flexDirection:'row',
+    alignItems:'center'
+  },
+  textSignUp:{
+    color:'grey',
+    fontSize:16,
+    marginEnd:5
+  },
+  textBtnSignUp:{
+    fontSize:16,
+    marginEnd:5,
+    fontWeight:'500'
+  }
+
 });
