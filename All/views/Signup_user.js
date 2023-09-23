@@ -3,13 +3,9 @@ import { StyleSheet, TouchableOpacity, View, Text, Image, TextInput, ImageBackgr
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from "@react-navigation/native";
-import { getApps, initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, FacebookAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential } from "firebase/auth";
 import { getDatabase, ref, set, push, get, child } from "firebase/database";
-import { } from "firebase/firestore";
-import { } from "firebase/functions";
-import { } from "firebase/storage";
+
+import firebase from "../db/firebase";
 
 
 const SignupScreen = (props) => {
@@ -21,43 +17,42 @@ const SignupScreen = (props) => {
   const [showPass, setShowPass] = useState(false);
 
   useEffect(() => {
-    const firebaseConfig = {
-      apiKey: "AIzaSyBb4v-OQ0999gtPkgNdyJD28eB7n2iSP-A",
-      authDomain: "test-reactnative-8b877.firebaseapp.com",
-      databaseURL: "https://test-reactnative-8b877-default-rtdb.firebaseio.com",
-      projectId: "test-reactnative-8b877",
-      storageBucket: "test-reactnative-8b877.appspot.com",
-      messagingSenderId: "977496658334",
-      appId: "1:977496658334:web:30f8cb82c28b91aadf068f",
-      measurementId: "G-6K4ZY7WGDC"
-    };
-
-    // Kiểm tra xem đã khởi tạo ứng dụng Firebase chưa
-    if (!getApps.length) {
-      const app = initializeApp(firebaseConfig);
-      console.log("Kết nối thành công");
-    }
+    firebase()
   }, []);
 
+  const checkLogin = async (name) => {
+    const db = getDatabase();
+    const userRef = ref(db, 'users');
+  
+    try {
+      const snapshot = await get(userRef);
+  
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const user = Object.values(users).find(
+          (userData) => userData.username === name
+        );
+            console.log(!!user);
+        return !!user; // Trả về true nếu tài khoản tồn tại, false nếu không tồn tại
+      } else {
+        console.log('Không có dữ liệu');
+        return false;
+      }
+    } catch (error) {
+      console.error('Lỗi khi đọc dữ liệu:', error);
+      throw error;
+    }
+  };
 
   const checkRegister = async () => {
     if (username.length > 0 && password.length > 0 && PhoneNumber.length > 0) {
       const pattern = /^(0|\+84)[1-9][0-9]{8}$/;
-
       if (password === re_password && pattern.test(PhoneNumber)) {
-        const db = getDatabase();
-        const usersRef = ref(db, 'users');
-
-        // Kiểm tra xem `username` đã tồn tại trong cơ sở dữ liệu chưa
-        const usernameSnapshot = await get(child(usersRef, username));
-        console.log(usernameSnapshot.exists())
-        if (!usernameSnapshot.exists()) {
-          // Nếu `username` chưa tồn tại, thêm người dùng mới vào cơ sở dữ liệu
-          
-          addNewUser(username , password , PhoneNumber)
-          console.log('Đăng ký thành công');
-        } else {
-          console.log('Tên người dùng đã tồn tại');
+        if( !await checkLogin(username)){
+            addNewUser(username , password , PhoneNumber)
+            console.log('đăng kí thành công')
+        }else{
+          console.log('đã tồn tại')
         }
       } else {
         console.log('Sai định dạng số điện thoại hoặc mật khẩu không khớp');
@@ -66,7 +61,7 @@ const SignupScreen = (props) => {
       console.log('Vui lòng điền đầy đủ thông tin');
     }
   }
-
+ 
   const addNewUser = (name, pass, sdt) => {
     const db = getDatabase(); // Lấy tham chiếu đến cơ sở dữ liệu Firebase
     // Tạo một tham chiếu mới dưới nút 'users/' và sử dụng hàm `push()` để tạo một khóa duy nhất

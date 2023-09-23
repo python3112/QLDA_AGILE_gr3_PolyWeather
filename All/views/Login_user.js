@@ -19,53 +19,12 @@ const LoginScreen = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  // Modal
-  const [isVisible, setIsVisible] = useState(false);
-  const closeModal = () => {
-    setIsVisible(false);
-  };
 
-  //Kết nối firebase
-  useEffect(() => {
-    firebase();
-  }, []);
+const LoginWithAccFirebase = () => {
 
-  //Check đăng nhập
-  const checkLogin = () => {
-    const db = getDatabase();
-    const userRef = ref(db, "users");
+}
 
-    get(userRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          // Kiểm tra tài khoản có tồn tại không
-          const user = Object.values(users).find(
-            (userData) => userData.username === username
-          );
-          //Kiểm tra mật khẩu
-          if (user) {
-            //Mật khẩu đúng => Chuyển sang màn hình Home
-            if (user.password === password) {
-              navigation.navigate("home");
-              //Mật khẩu sai => In ra thông báo
-            } else {
-              setIsVisible(true);
-            }
-            //Tài khoản không tồn tại
-          } else {
-            setIsVisible(true);
-          }
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error("Error reading data: ", error);
-      });
-  };
 
-  const LoginWithAccFirebase = () => {};
 
   return (
     <View style={styles.container}>
