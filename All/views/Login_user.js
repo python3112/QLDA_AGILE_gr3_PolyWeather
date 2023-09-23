@@ -6,16 +6,25 @@ import {
   Text,
   Image,
   TextInput,
+  Modal
 } from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
 
+
 const LoginScreen = (props) => {
   const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [visModel, setvisModel] = useState(true);
   const [showPass, setShowPass] = useState(false);
+
+const LoginWithAccFirebase = () => {
+
+}
+
+
 
   return (
     <View style={styles.container}>
@@ -117,7 +126,18 @@ const LoginScreen = (props) => {
           </View>
         </View>
       </View>
+
+      {/* <Modal animationType="slide" transparent={true} visible={visModel}>
+              <View>
+                <Text>Đăng Nhập </Text>
+              </View>
+      </Modal> */}
     </View>
+
+
+////// modal //////////////
+
+
   );
 };
 
