@@ -75,7 +75,7 @@ const LoginScreen = (props) => {
         <TouchableOpacity
           style={styles.btnLogin}
           onPress={() => {
-            navigation.navigate("signup");
+            navigation.navigate("home");
           }}
         >
           <Text style={styles.textBtnLogin}>Login</Text>
@@ -106,26 +106,28 @@ const LoginScreen = (props) => {
           {/* Button Facebook*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
-                style={{ width: 50, height: 50 }}
+                style={styles.logoOthers}
                 source={require("../image/logoFB.png")}
               />
             </TouchableOpacity>
           {/* Button Google*/}
             <TouchableOpacity style={styles.logo_Other_Login}>
               <Image
-                style={{ width: 50, height: 50 }}
+                style={styles.logoOthers}
                 source={require("../image/logoGG.png")}
               />
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.containerSignUp}>
+      </View>
+      <View style={styles.containerSignUp}>
           <Text style={styles.textSignUp}>Not register yet?</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate("signup");
+          }}>
           <Text style={styles.textBtnSignUp}>Create account</Text>
           </TouchableOpacity>
         </View>
-      </View>
     </View>
   );
 };
@@ -245,11 +247,18 @@ const styles = StyleSheet.create({
     height: 50,
     marginEnd: 20,
     marginStart: 20,
-    borderRadius: 12,
+    borderRadius: 25,
     justifyContent: "center",
+    alignItems:'center',
+    backgroundColor:'#C0C0C0',
+  },
+  logoOthers:{
+    width: 40,
+    height: 40,
   },
   containerSignUp:{
-    marginTop:100,
+    position:'absolute',
+    bottom:20,
     flexDirection:'row',
     alignItems:'center'
   },

@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import LoginScreen from './All/views/Login_user';
 import Splash_screen from './All/views/Splash_screen';
 import SignupScreen from './All/views/Signup_user';
+import Home_screen from './All/views/Home_screen';
 
 
 const Stack = createNativeStackNavigator();
@@ -16,6 +17,7 @@ export default function App() {
           <Stack.Screen name = 'splash' component={Splash_screen} options={{headerShown:false}}  />
           <Stack.Screen name = 'login' component={LoginScreen} options={{headerShown:false}}  />
           <Stack.Screen name = 'signup' component={SignupScreen} options={{headerShown:false}}  />
+          <Stack.Screen name = 'home' component={Home_screen} options={{headerShown:false}}  />
         </Stack.Navigator>
 
     </NavigationContainer>
