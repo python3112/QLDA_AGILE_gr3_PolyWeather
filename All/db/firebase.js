@@ -1,7 +1,4 @@
 import { getApps, initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, FacebookAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential } from "firebase/auth";
-import { getDatabase, ref, set, push, get, child } from "firebase/database";
 import { } from "firebase/firestore";
 import { } from "firebase/functions";
 import { } from "firebase/storage";
