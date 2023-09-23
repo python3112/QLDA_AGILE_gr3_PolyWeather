@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Text, Image, TextInput, ImageBackground } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text, Image, TextInput, ImageBackground , Modal } from "react-native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +15,13 @@ const SignupScreen = (props) => {
   const [PhoneNumber, setPhoneNumber] = useState("");
   const [re_password, setre_password] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [textErr, settextErr] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+
+  // modal////
+  const closeModal = () => {
+    setIsVisible(false);
+  };
 
   useEffect(() => {
     firebase()
@@ -51,13 +58,20 @@ const SignupScreen = (props) => {
         if( !await checkLogin(username)){
             addNewUser(username , password , PhoneNumber)
             console.log('đăng kí thành công')
+            navigation.navigate('login');
         }else{
+          setIsVisible(true);
+          settextErr("Tên tài khoản đã tồn tại !");
           console.log('đã tồn tại')
         }
       } else {
+        setIsVisible(true);
+      settextErr("Sai định dạng số điện thoại hoặc mật khẩu không khớp");
         console.log('Sai định dạng số điện thoại hoặc mật khẩu không khớp');
       }
     } else {
+      setIsVisible(true);
+      settextErr("Vui lòng điền đầy đủ thông tin");
       console.log('Vui lòng điền đầy đủ thông tin');
     }
   }
@@ -193,7 +207,88 @@ const SignupScreen = (props) => {
                 <Text>Đăng Nhập </Text>
               </View>
       </Modal> */}
-
+       <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isVisible}
+          onRequestClose={closeModal}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <View
+              style={{
+                width: "80%",
+                height: 163,
+                backgroundColor: "white",
+                borderRadius: 10,
+                elevation: 10,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "red",
+                  height: 50,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderTopLeftRadius: 10,
+                  borderTopRightRadius: 10,
+                }}
+              >
+                <FontAwesome5
+                  name="exclamation-triangle"
+                  size={30}
+                  color="white"
+                  style={{ marginStart: 10 }}
+                />
+                <Text
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    marginStart: 15,
+                  }}
+                >
+                  Sign up failed
+                </Text>
+              </View>
+              <View
+                style={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  height: 70,
+                  borderBottomWidth: 0.4,
+                  borderColor: "gray",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 16 }}>
+                    {textErr}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={closeModal}
+                style={{
+                  borderRadius: 5,
+                  borderColor: "grey",
+                  marginTop: 5,
+                  alignSelf: "flex-end",
+                  marginEnd: 10,
+                  borderWidth: 1,
+                  width: 60,
+                  padding: 5,
+                }}
+              >
+                <Text style={{ textAlign: "center" }}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
       <View style={styles.containerSignUp}>
         <Text style={styles.textSignUp}>Already have an account ?</Text>

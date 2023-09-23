@@ -19,6 +19,7 @@ const LoginScreen = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [textErr, settextErr] = useState("");
   // Modal
   const [isVisible, setIsVisible] = useState(false);
   const closeModal = () => {
@@ -51,10 +52,12 @@ const LoginScreen = (props) => {
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
+              settextErr('sai mật khẩu')
             }
             //Tài khoản không tồn tại
           } else {
             setIsVisible(true);
+            settextErr('Tài khoản không tồn tại')
           }
         } else {
           console.log("No data available");
@@ -65,7 +68,7 @@ const LoginScreen = (props) => {
       });
   };
 
-  const LoginWithAccFirebase = () => {};
+  
 
   return (
     <View style={styles.container}>
@@ -184,7 +187,7 @@ const LoginScreen = (props) => {
                 }}
               >
                 <Text style={{ fontSize: 16 }}>
-                  Incorrect username or password!
+                  {textErr}
                 </Text>
               </View>
               <TouchableOpacity
