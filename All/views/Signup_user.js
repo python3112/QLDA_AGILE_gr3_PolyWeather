@@ -12,7 +12,9 @@ const SignupScreen = (props) => {
   const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [PhoneNumber, setPhoneNumber] = useState("");
+  const [fullName, setfullName] = useState("");
+  const [adress, setadress] = useState("");
+  const [status, setstatus] = useState(false);
   const [re_password, setre_password] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [textErr, settextErr] = useState("");
@@ -42,7 +44,7 @@ const SignupScreen = (props) => {
             console.log(!!user);
         return !!user; // Trả về true nếu tài khoản tồn tại, false nếu không tồn tại
       } else {
-        console.log('Không có dữ liệu');
+        console.log('checkLogin:Không có dữ liệu');
         return false;
       }
     } catch (error) {
@@ -52,21 +54,21 @@ const SignupScreen = (props) => {
   };
 
   const checkRegister = async () => {
-    if (username.length > 0 && password.length > 0 && PhoneNumber.length > 0) {
-      const pattern = /^(0|\+84)[1-9][0-9]{8}$/;
-      if (password === re_password && pattern.test(PhoneNumber)) {
+    if (username.length > 0 && password.length > 0 && adress.length > 0) {
+     
+      if (password === re_password || fullName.length > 20) {
         if( !await checkLogin(username)){
-            addNewUser(username , password , PhoneNumber)
-            console.log('đăng kí thành công')
+            addNewUser(fullName,username , password , adress ,status)
+            console.log('checkRegister:đăng kí thành công')
             navigation.navigate('login');
         }else{
           setIsVisible(true);
           settextErr("Tên tài khoản đã tồn tại !");
-          console.log('đã tồn tại')
+          console.log('checkRegister:đã tồn tại')
         }
       } else {
         setIsVisible(true);
-      settextErr("Sai định dạng số điện thoại hoặc mật khẩu không khớp");
+      settextErr("Sai họ tên   hoặc mật khẩu không khớp");
         console.log('Sai định dạng số điện thoại hoặc mật khẩu không khớp');
       }
     } else {
@@ -76,7 +78,7 @@ const SignupScreen = (props) => {
     }
   }
  
-  const addNewUser = (name, pass, sdt) => {
+  const addNewUser = ( fullName, name, pass , adress , status) => {
     const db = getDatabase(); // Lấy tham chiếu đến cơ sở dữ liệu Firebase
     // Tạo một tham chiếu mới dưới nút 'users/' và sử dụng hàm `push()` để tạo một khóa duy nhất
     const newUserRef = push(ref(db, 'users'));
@@ -85,9 +87,11 @@ const SignupScreen = (props) => {
 
     // Tạo dữ liệu người dùng mới và đặt vào cơ sở dữ liệu
     set(newUserRef, {
+      userFullName:fullName,
       username: name,         // Gán tên người dùng
       password: pass,            // Gán email người dùng
-      phonenumber: sdt   // Gán ảnh đại diện người dùng
+      userAdress: adress ,
+       userStatus:status // Gán ảnh đại diện người dùng
     });
 
     return userId; // Trả về khóa duy nhất của người dùng mới (nếu cần)
@@ -106,6 +110,19 @@ const SignupScreen = (props) => {
         {/* Phần nhập dữ liệu */}
         <View style={styles.containerInput}>
           {/* Tài khoản */}
+          <View style={styles.viewInPut}>
+            <FontAwesome5
+              name="user"
+              size={20}
+              color="orange"
+              style={{ marginEnd: 10 }}
+            />
+            <TextInput
+              style={styles.tipUserName}
+              placeholder="Full name"
+              onChangeText={(text) => setfullName(text)}
+            />
+          </View>
           <View style={styles.viewInPut}>
             <FontAwesome5
               name="user"
@@ -180,8 +197,8 @@ const SignupScreen = (props) => {
             />
             <TextInput
               style={styles.tipUserName}
-              placeholder="Phone"
-              onChangeText={(text) => setPhoneNumber(text)}
+              placeholder="hà nội"
+              onChangeText={(text) => setadress(text)}
             />
           </View>
         </View>
