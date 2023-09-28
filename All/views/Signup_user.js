@@ -197,7 +197,7 @@ const SignupScreen = (props) => {
             />
             <TextInput
               style={styles.tipUserName}
-              placeholder="hà nội"
+              placeholder="Phone number"
               onChangeText={(text) => setadress(text)}
             />
           </View>

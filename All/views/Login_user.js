@@ -52,12 +52,12 @@ const LoginScreen = (props) => {
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
-              settextErr('sai mật khẩu')
+              settextErr('Wrong password !')
             }
             //Tài khoản không tồn tại
           } else {
             setIsVisible(true);
-            settextErr('Tài khoản không tồn tại')
+            settextErr('Account does not exist !')
           }
         } else {
           console.log("No data available");
@@ -133,31 +133,11 @@ const LoginScreen = (props) => {
           onRequestClose={closeModal}
         >
           <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            }}
+            style={styles.containerModal}
           >
-            <View
-              style={{
-                width: "80%",
-                height: 163,
-                backgroundColor: "white",
-                borderRadius: 10,
-                elevation: 10,
-              }}
-            >
+            <View style={styles.viewModal}>
               <View
-                style={{
-                  backgroundColor: "red",
-                  height: 50,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  borderTopLeftRadius: 10,
-                  borderTopRightRadius: 10,
-                }}
+                style={styles.headerModal}
               >
                 <FontAwesome5
                   name="exclamation-triangle"
@@ -166,42 +146,21 @@ const LoginScreen = (props) => {
                   style={{ marginStart: 10 }}
                 />
                 <Text
-                  style={{
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: 20,
-                    marginStart: 15,
-                  }}
+                  style={styles.textHeaderModal}
                 >
                   Login failed
                 </Text>
               </View>
               <View
-                style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  height: 70,
-                  borderBottomWidth: 0.4,
-                  borderColor: "gray",
-                  justifyContent: "center",
-                }}
+                style={styles.bodyModal}
               >
-                <Text style={{ fontSize: 16 }}>
+                <Text style={{ fontSize: 16}}>
                   {textErr}
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={closeModal}
-                style={{
-                  borderRadius: 5,
-                  borderColor: "grey",
-                  marginTop: 5,
-                  alignSelf: "flex-end",
-                  marginEnd: 10,
-                  borderWidth: 1,
-                  width: 60,
-                  padding: 5,
-                }}
+                style={styles.btnModal}
               >
                 <Text style={{ textAlign: "center" }}>Close</Text>
               </TouchableOpacity>
@@ -219,21 +178,13 @@ const LoginScreen = (props) => {
         <View style={styles.loginWithOtherAccount}>
           <View style={styles.lineBlack}>
             <View
-              style={{
-                height: 0.5,
-                backgroundColor: "grey",
-                width: "30%",
-              }}
+              style={styles.line}
             />
-            <Text style={{ fontSize: 16, color: "grey", marginHorizontal: 15 }}>
+            <Text style={styles.textLoginOther}>
               Or sign in with
             </Text>
             <View
-              style={{
-                height: 0.5,
-                backgroundColor: "grey",
-                width: "30%",
-              }}
+              style={styles.line}
             />
           </View>
 
@@ -274,7 +225,6 @@ const LoginScreen = (props) => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  // Chia bố cục
   container: {
     flex: 1,
     padding: 16,
@@ -282,16 +232,23 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   logo: {
-    position: "relative",
-    top: 50,
+    position: "absolute",
+    top: 50, // Vị trí cố định từ trên xuống
     alignItems: "center",
   },
   body: {
     width: "93%",
-    position: "relative",
-    top: 80,
+    position: "absolute",
+    top: 300, // Vị trí cố định từ trên xuống
     alignItems: "center",
   },
+  containerSignUp: {
+    position: "absolute",
+    bottom: 20, // Vị trí cố định từ dưới lên
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  
   //Logo
   imageLogo: {
     width: 150,
@@ -395,12 +352,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-  containerSignUp: {
-    position: "absolute",
-    bottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
+  line:{
+    height: 0.5,
+    backgroundColor: "grey",
+    width: "30%",
   },
+  textLoginOther:{
+    fontSize: 16, color: "grey", marginHorizontal: 15
+  },
+//  SignUp
   textSignUp: {
     color: "grey",
     fontSize: 16,
@@ -411,9 +371,56 @@ const styles = StyleSheet.create({
     marginEnd: 5,
     fontWeight: "500",
   },
+ 
+  // Modal 
   messageLogin: {
     color: "red",
     alignSelf: "flex-start",
     marginTop: 10,
   },
+  containerModal:{
+    flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  viewModal:{
+    width: "80%",
+    height: 163,
+    backgroundColor: "white",
+    borderRadius: 10,
+    elevation: 10,
+  },
+  headerModal:{
+    backgroundColor: "red",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  textHeaderModal:{
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 20,
+    marginStart: 15,
+  },
+  bodyModal:{
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    height: 70,
+    borderBottomWidth: 0.4,
+    borderColor: "gray",
+    justifyContent: "center",
+  },
+  btnModal:{
+    borderRadius: 5,
+    borderColor: "grey",
+    marginTop: 5,
+    alignSelf: "flex-end",
+    marginEnd: 10,
+    borderWidth: 1,
+    width: 60,
+    padding: 5,
+  }
 });
