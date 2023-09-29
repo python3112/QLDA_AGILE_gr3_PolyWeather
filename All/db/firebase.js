@@ -20,7 +20,7 @@ export default function firebase() {
       // Kiểm tra xem đã khởi tạo ứng dụng Firebase chưa
       if (!getApps.length) {
         const app = initializeApp(firebaseConfig);
-        console.log("Kết nối thành công");
+        console.log("Kết nối  firebase thành công");
       }
 
 

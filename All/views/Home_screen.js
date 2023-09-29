@@ -1,10 +1,25 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React , {useEffect , useState} from 'react'
 import 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Home_screen = (props) => {
   const { navigation } = props;
+
+ useEffect(() => {
+  AsyncStorage.getItem('Data_User', (error, result) => {
+    if (!error) {
+     const user = JSON.parse(result)
+    
+      console.log('Giá trị đã lưu: ' + result + ' '  );
+    } else {
+      console.log('Lỗi khi đọc giá trị: ' + error);
+    }
+  });
+ }, [])
+ 
+
   return (
     <View style={styles.container}>
       <Image source={require("../image/anhHome.jpg")} style={{ width: "100%", height: 300, borderRadius: 10, marginTop: 10 }} />

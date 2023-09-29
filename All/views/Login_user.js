@@ -13,6 +13,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "../db/firebase";
 import { getDatabase, ref, get } from "firebase/database";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = (props) => {
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const LoginScreen = (props) => {
   }, []);
 
   //Check đăng nhập
-  const checkLogin = () => {
+  const checkLogin = async() => {
     const db = getDatabase();
     const userRef = ref(db, "users");
 
@@ -46,9 +47,11 @@ const LoginScreen = (props) => {
           );
           //Kiểm tra mật khẩu
           if (user) {
+           
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
-              navigation.navigate("home");
+                 Save_Data_User(user);
+               navigation.navigate("home");
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
@@ -68,7 +71,17 @@ const LoginScreen = (props) => {
       });
   };
 
-  
+  const Save_Data_User = async(user_Login) => {
+    try {
+      const jsonValue = JSON.stringify(user_Login);
+    const kq =  await AsyncStorage.setItem('Data_User', jsonValue);
+    if(kq){
+      console.log("thành công " +  kq)
+    }
+    } catch (e) {
+      console.log("lưu data lỗi :" + e)
+    }
+  }
 
   return (
     <View style={styles.container}>

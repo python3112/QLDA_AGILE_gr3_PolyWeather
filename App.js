@@ -7,12 +7,19 @@ import Splash_screen from './All/views/Splash_screen';
 import SignupScreen from './All/views/Signup_user';
 import Home_screen from './All/views/Home_screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { DrawerItemList, createDrawerNavigator , DrawerContentScrollView } from '@react-navigation/drawer';
+import { DrawerItemList, createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
 
 
 const CustomHeader = () => (
-  <View style={{ height: 100, justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightblue' }}>
-    <Text style={{ fontSize: 20 }}>Custom Header</Text>
+  <View
+    style={{
+      height: 200,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'lightblue'
+    }}>
+    <Text 
+    style={{ fontSize: 20 }}>Custom Header</Text>
   </View>
 );
 
@@ -20,8 +27,8 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => (
   <DrawerContentScrollView {...props}>
-    <CustomHeader /> 
-    <DrawerItemList {...props} /> 
+    <CustomHeader />
+    <DrawerItemList {...props} />
   </DrawerContentScrollView>
 );
 
@@ -30,15 +37,15 @@ function DrawerNav() {
   return (
 
     <Drawer.Navigator screenOptions={{}}
-    drawerContent={props => <CustomDrawerContent {...props} />}
-     >
+      drawerContent={props => <CustomDrawerContent {...props} />}
+    >
       <Drawer.Screen name='homeA'
         component={Home_screen}
         options={{
           drawerLabel: 'Home',
           title: 'Home',
           drawerIcon: () => (
-            <Ionicons name='home-outline' size={23} color="black"/>
+            <Ionicons name='home-outline' size={23} color="black" />
           )
         }} />
 
@@ -57,18 +64,29 @@ export default function App() {
 
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name='splash' component={Splash_screen} options={{ headerShown: false }} />
-        <Stack.Screen name='login' component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name='signup' component={SignupScreen} options={{ headerShown: false }} />
-        <Stack.Screen name='home' component={DrawerNav} options={{ headerShown: false }}>
-          {/* {()=>{
-              <Drawer.Navigator screenOptions={{}}>
-                <Drawer.Screen name='home' component={Home_screen} options={{headerShown:false }}>
+        <Stack.Screen
+          name='splash'
+          component={Splash_screen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='login'
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='signup'
+          component={SignupScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='home'
+          component={DrawerNav}
+          options={{ headerShown: false }}
+        />
 
-                </Drawer.Screen>
-              </Drawer.Navigator>
-            }} */}
-        </Stack.Screen>
+
+
       </Stack.Navigator>
 
     </NavigationContainer>

@@ -177,7 +177,10 @@ const SignupScreen = (props) => {
             />
             <TouchableOpacity
               onPress={() => setShowPass(!showPass)}
-              style={{ justifyContent: "center", width: "10%", height: "100%" }}
+              style={{ 
+                justifyContent: "center",
+                 width: "10%",
+                  height: "100%" }}
             >
               <Entypo
                 name={showPass ? "eye" : "eye-with-line"}
@@ -197,7 +200,7 @@ const SignupScreen = (props) => {
             />
             <TextInput
               style={styles.tipUserName}
-              placeholder="Phone number"
+              placeholder="Adress City "
               onChangeText={(text) => setadress(text)}
             />
           </View>
