@@ -8,6 +8,7 @@ import {
   TextInput,
   Modal,
 } from "react-native";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
 import firebase from "../db/firebase";
