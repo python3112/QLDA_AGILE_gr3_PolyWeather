@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
+import 'react-native-gesture-handler';
 
-const Home_screen = () => {
+
+const Home_screen = (props) => {
+  const { navigation } = props;
   return (
     <View style={styles.container}>
       <Image source={require("../image/anhHome.jpg")} style={{ width: "100%", height: 300, borderRadius: 10, marginTop: 10 }} />
@@ -35,9 +38,9 @@ const Home_screen = () => {
           <Image style={{ width: 30, height: 30 }} source={require("../image/rays.png")} />
           <Text>Chỉ số UV</Text>
           <View style={styles.btnDetails}>
-           <Text style={styles.txtDetail}>1</Text> 
+            <Text style={styles.txtDetail}>1</Text>
           </View>
-          
+
         </TouchableOpacity>
       </View>
       <View style={styles.btnDetails}>
@@ -52,7 +55,7 @@ const Home_screen = () => {
         <TouchableOpacity style={styles.btn}>
           <Image style={{ width: 30, height: 30 }} source={require("../image/wind.png")} />
           <Text>Wind speed</Text>
-          
+
           <View style={styles.btnDetails}>
             <Text style={styles.txtDetail}>10</Text>
             <Text style={styles.textD}> Km/s</Text>
@@ -62,9 +65,9 @@ const Home_screen = () => {
           <Image style={{ width: 30, height: 30 }} source={require("../image/blood-pressure.png")} />
           <Text>Pressure</Text>
           <View style={styles.btnDetails}>
-             <Text style={styles.txtDetail}>1015</Text>
+            <Text style={styles.txtDetail}>1015</Text>
           </View>
-          
+
         </TouchableOpacity>
       </View>
 
@@ -95,13 +98,13 @@ const styles = StyleSheet.create({
     margin: 10,
 
   },
-  txtDetail:{
-    fontSize:20
+  txtDetail: {
+    fontSize: 20
   },
-  textD:{
-    fontSize:20,
-    color:'gray',
-    marginLeft:5
+  textD: {
+    fontSize: 20,
+    color: 'gray',
+    marginLeft: 5
   }
 
 
