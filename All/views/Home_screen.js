@@ -1,22 +1,42 @@
-import React from "react";
+import React ,{useEffect,useState} from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  TouchableOpacity,
   ScrollView,
   Dimensions,
 } from "react-native";
 import "react-native-gesture-handler";
-import { Appbar } from "react-native-paper";
-import "react-native-dimension";
-
+import moment from "moment";
+import fetchWeatherData from "../db/apiWeather";
 const Home_screen = (props) => {
   const { navigation } = props;
+  const [weatherData, setWeatherData] = useState(null);
+  // Lấy kích thước màn hình
   const windowWidth = Dimensions.get("window").width * 0.92;
   const windowWidthDetail = Dimensions.get("window").width * 0.282;
+  // Lấy ngày
+  const [currentDateTime, setCurrentDateTime] = useState(
+    moment().format("dddd, MMMM D, YYYY")
+  );
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(moment().format("dddd, MMMM D, YYYY"));
+    }, 1000);
 
+    return () => clearInterval(timer);
+  }, []);
+  // Lấy dữ liệu từ api
+  useEffect(() => {
+    fetchWeatherData()
+      .then((data) => {
+        setWeatherData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching weather data:", error);
+      });
+  }, []);
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -56,6 +76,7 @@ const Home_screen = (props) => {
       color: "gray",
     },
     dateText: {
+      fontSize:16,
       color: "gray",
     },
     locationText: {
@@ -136,10 +157,10 @@ const Home_screen = (props) => {
           <View
             style={styles.temperatureDetails}
           >
-            <Text style={styles.temperatureText}>40.7</Text>
+            <Text style={styles.temperatureText}>{weatherData.current['temp_c']}</Text>
             <Text style={styles.temperatureUnit}> °C</Text>
           </View>
-          <Text
+          {/* <Text
             style={{
               paddingBottom: 25,
               fontSize: 32,
@@ -159,14 +180,14 @@ const Home_screen = (props) => {
             }}
           >
             24.4°
-          </Text>
+          </Text> */}
         </View>
         {/* Ngày tháng năm hiện tại*/}
-        <Text style={styles.dateText}>THURSDAY, SEPTEMBER 29, 2023</Text>
+        <Text style={styles.dateText}>{currentDateTime}</Text>
         {/* Địa điểm */}
-        <Text style={styles.locationText}>Nam Tu Liem</Text>
+        <Text style={styles.locationText}>{weatherData.location['name']}</Text>
         {/* Trạng thái thời tiết */}
-        <Text style={styles.weatherStatusText}>Fair</Text>
+        <Text style={styles.weatherStatusText}>{weatherData.current['condition']['text']}</Text>
         {/* Chi tiết */}
         <Text style={styles.detailHeaderText}>DETAIL</Text>
         <View style={styles.detailContainer}>
@@ -179,7 +200,7 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>Feels Like</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>40.7</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['feelslike_c']}</Text>
                 <Text style={styles.detailUnit}> °C</Text>
               </View>
             </View>
@@ -191,7 +212,7 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>Humidity</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>59</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['humidity']}</Text>
                 <Text style={styles.detailUnit}> %</Text>
               </View>
             </View>
@@ -203,7 +224,7 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>UV Index</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>5</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['uv']}</Text>
               </View>
             </View>
           </View>
@@ -216,7 +237,7 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>Visibility</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>10</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['vis_km']}</Text>
                 <Text style={styles.detailUnit}> km</Text>
               </View>
             </View>
@@ -228,8 +249,8 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>Speed Wind</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>10.9</Text>
-                <Text style={styles.detailUnit}> m/s</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['wind_kph']}</Text>
+                <Text style={styles.detailUnit}> km/h</Text>
               </View>
             </View>
             {/* Áp suất */}
@@ -240,7 +261,7 @@ const Home_screen = (props) => {
               />
               <Text style={styles.detailName}>Pressure</Text>
               <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>1008</Text>
+                <Text style={styles.detailAbout}>{weatherData.current['pressure_mb']}</Text>
               </View>
             </View>
           </View>
