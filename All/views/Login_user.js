@@ -16,7 +16,7 @@ import { getDatabase, ref, get } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = (props) => {
-  const navigation = useNavigation();
+  const {navigation } = props
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -50,7 +50,7 @@ const LoginScreen = (props) => {
            
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
-                 Save_Data_User(user);
+                Save_Data_User(user);
                navigation.navigate("home");
               //Mật khẩu sai => In ra thông báo
             } else {

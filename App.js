@@ -7,25 +7,48 @@ import Splash_screen from './All/views/Splash_screen';
 import SignupScreen from './All/views/Signup_user';
 import Home_screen from './All/views/Home_screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import { DrawerItemList, createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from 'react'
+import Setting from './All/views/Setting';
 
 
-const CustomHeader = () => (
-  <View
-    style={{
-      height: 200,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'lightblue'
-    }}>
-    <Text 
-    style={{ fontSize: 20 }}>Custom Header</Text>
-  </View>
-);
+const CustomHeader = () => {
+  const [Data, setData] = useState(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem('Data_User', (error, result) => {
+      if (!error) {
+        const user = JSON.parse(result)
+        setData(user);
+        console.log('user from header DrawNav : ' + result + ' ');
+      } else {
+        console.log('error from header DrawNav: ' + error);
+      }
+    });
+  }, [])
+
+  return (
+
+    <View
+      style={{
+        height: 200,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'lightblue'
+      }}>
+      <Text
+        style={{ fontSize: 20 }}></Text>
+    </View>
+  )
+};
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => (
+
+
   <DrawerContentScrollView {...props}>
     <CustomHeader />
     <DrawerItemList {...props} />
@@ -46,6 +69,16 @@ function DrawerNav() {
           title: 'Home',
           drawerIcon: () => (
             <Ionicons name='home-outline' size={23} color="black" />
+          )
+        }} />
+
+      <Drawer.Screen name='Setting'
+        component={Setting}
+        options={{
+          drawerLabel: 'Setting Account',
+          title: 'Setting Account',
+          drawerIcon: () => (
+            <AntDesign name='setting' size={23} color="black" />
           )
         }} />
 
