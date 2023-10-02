@@ -34,6 +34,11 @@ const Home_screen = (props) => {
       width: "100%",
       alignItems: "center",
     },
+    temperatureDetails:{
+      flexDirection: "row",
+      marginEnd: 15,
+      alignItems: "flex-end",
+    },
     temperatureText: {
       fontSize: 68,
       fontWeight: "100",
@@ -129,11 +134,7 @@ const Home_screen = (props) => {
         {/* Nhiệt độ */}
         <View style={styles.temperatureContainer}>
           <View
-            style={{
-              flexDirection: "row",
-              marginEnd: 15,
-              alignItems: "flex-end",
-            }}
+            style={styles.temperatureDetails}
           >
             <Text style={styles.temperatureText}>40.7</Text>
             <Text style={styles.temperatureUnit}> °C</Text>
