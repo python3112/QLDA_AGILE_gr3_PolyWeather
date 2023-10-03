@@ -7,7 +7,8 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
@@ -52,7 +53,7 @@ const Home_screen = (props) => {
       // Đảm bảo rằng địa chỉ không trống
       return;
     }
-  
+
     // Gửi yêu cầu tìm kiếm thời tiết với địa chỉ người dùng nhập
     fetchWeatherData(searchAddress)
       .then((data) => {
@@ -62,7 +63,7 @@ const Home_screen = (props) => {
         console.error("Error fetching weather data:", error);
       });
   };
-  
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -171,17 +172,48 @@ const Home_screen = (props) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={{}}
-        placeholder="Enter Address"
-        value={searchAddress}
-        onChangeText={(text) => setSearchAddress(text)}
-      />
-
-      <TouchableOpacity style={{}} onPress={searchWeather}>
-        <Text style={{}}>Search</Text>
-      </TouchableOpacity>
       <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            height: 40,
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <TextInput
+            style={{
+              paddingStart: 10,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: "orange",
+              height: 40,
+              width: "65%",
+              marginEnd: 15,
+              fontSize: 17,
+              fontWeight: "500",
+            }}
+            placeholder="Enter Address"
+            value={searchAddress}
+            onChangeText={(text) => setSearchAddress(text)}
+          />
+          <TouchableOpacity
+            style={{
+              backgroundColor: "orange",
+              height: 40,
+              borderRadius: 5,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onPress={searchWeather}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17, color: "white" }}>
+              Search
+            </Text>
+          </TouchableOpacity>
+        </View>
         {/* Kiểm tra dữ liệu */}
         {weatherData !== null ? (
           <>
@@ -323,7 +355,11 @@ const Home_screen = (props) => {
           </>
         ) : (
           // Hiển thị nếu dữ liệu null
-          <Text style={{ alignSelf: "center" }}>Loading weather data...</Text>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color="orange" />
+          </View>
         )}
       </ScrollView>
     </View>
