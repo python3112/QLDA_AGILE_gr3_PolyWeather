@@ -29,6 +29,7 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
+   
     fetchWeatherData()
       .then((data) => {
         setWeatherData(data);

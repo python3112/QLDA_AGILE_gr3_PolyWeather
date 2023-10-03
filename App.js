@@ -19,7 +19,17 @@ const CustomHeader = () => {
   const [Data, setData] = useState(null);
 
  useEffect(() => {
-   getDataLogin()
+  AsyncStorage.getItem('Data_User', (error, result) => {
+    if (!error) {
+      const user = JSON.parse(result)
+       setData(user)
+      console.log('user from header DrawNav : ' + result + ' ' );
+      return user;
+    } else {
+      console.log('error from header DrawNav: ' + error);
+    }
+  });
+   
  }, [])
  
 
@@ -27,14 +37,22 @@ const CustomHeader = () => {
 
     <View
       style={{
-        height: 200,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'lightblue'
+        
       }}>
+        <Image style={{width:100 , height:100 , borderRadius:50}} source={require('./All/image/snowy.jpg')}>
+
+        </Image>
       <Text
-        style={{ fontSize: 20 }}></Text>
+        style={{ fontSize: 20  , color:'rgba(0, 0, 0 , 0.5)', marginTop:20 }}>{Data.userFullName}#{Data.userAdress}</Text>
+
+        <View style={{backgroundColor:'black' , height:1 ,width:400 , marginTop:20 , marginBottom:10}}>
+
+        </View>
     </View>
+
+    
   )
 };
 

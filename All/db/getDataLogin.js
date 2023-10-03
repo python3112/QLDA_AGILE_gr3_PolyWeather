@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React ,{} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const getDataLogin = () => {
+const getDataLogin = async() => {
    
         AsyncStorage.getItem('Data_User', (error, result) => {
           if (!error) {
@@ -13,6 +13,14 @@ const getDataLogin = () => {
             console.log('error from header DrawNav: ' + error);
           }
         });
+
+
+
+        try {
+          
+        } catch (error) {
+          
+        }
    
     }
 
