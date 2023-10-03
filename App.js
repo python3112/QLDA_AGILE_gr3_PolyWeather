@@ -43,15 +43,9 @@ const CustomHeader = () => {
       <Image style={{ width: 100, height: 100, borderRadius: 50 }} source={require('./All/image/snowy.jpg')}>
 
       </Image>
-      {/* <Text
+      <Text
         style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20 }}>{Data == null ? 'User ' : Data.userFullName
-        }</Text> */}
-
-        {Data ==!  null  ? <Text>
-              đang lload tên 
-        </Text> : <Text>
-          {Data.userFullName}
-          </Text>}
+        }</Text>
 
       <View style={{ backgroundColor: 'black', height: 1, width: 400, marginTop: 20, marginBottom: 10 }}>
 

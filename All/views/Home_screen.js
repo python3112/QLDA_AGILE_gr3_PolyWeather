@@ -1,4 +1,4 @@
-import React ,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,8 @@ import {
   Image,
   ScrollView,
   Dimensions,
+  TextInput,
+  TouchableOpacity
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
@@ -13,6 +15,7 @@ import fetchWeatherData from "../db/apiWeather";
 import getDataLogin from "../db/getDataLogin";
 const Home_screen = (props) => {
   const { navigation } = props;
+  const [searchAddress, setSearchAddress] = useState("");
   const [weatherData, setWeatherData] = useState(null);
   // Lấy kích thước màn hình
   const windowWidth = Dimensions.get("window").width * 0.92;
@@ -30,13 +33,13 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    if( getDataLogin('home') != null ){
-      console.log("dữ liệu ở home lấy được từ Asyc" + getDataLogin('home'));
-    }else{
-      console.log('lỗi  home')
+    if (getDataLogin("home") != null) {
+      console.log("dữ liệu ở home lấy được từ Asyc" + getDataLogin("home"));
+    } else {
+      console.log("lỗi  home");
     }
-   
-    fetchWeatherData()
+
+    fetchWeatherData(searchAddress)
       .then((data) => {
         setWeatherData(data);
       })
@@ -44,6 +47,22 @@ const Home_screen = (props) => {
         console.error("Error fetching weather data:", error);
       });
   }, []);
+  const searchWeather = () => {
+    if (searchAddress.trim() === "") {
+      // Đảm bảo rằng địa chỉ không trống
+      return;
+    }
+  
+    // Gửi yêu cầu tìm kiếm thời tiết với địa chỉ người dùng nhập
+    fetchWeatherData(searchAddress)
+      .then((data) => {
+        setWeatherData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching weather data:", error);
+      });
+  };
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -61,7 +80,7 @@ const Home_screen = (props) => {
       width: "100%",
       alignItems: "center",
     },
-    temperatureDetails:{
+    temperatureDetails: {
       flexDirection: "row",
       marginEnd: 15,
       alignItems: "flex-end",
@@ -83,7 +102,7 @@ const Home_screen = (props) => {
       color: "gray",
     },
     dateText: {
-      fontSize:16,
+      fontSize: 16,
       color: "gray",
     },
     locationText: {
@@ -141,36 +160,45 @@ const Home_screen = (props) => {
     detailAbout: {
       fontSize: 30,
       color: "black",
-      fontWeight:'400'
+      fontWeight: "400",
     },
     detailUnit: {
       fontSize: 18,
-      fontWeight:'300',
+      fontWeight: "300",
       color: "grey",
-
     },
   });
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={{}}
+        placeholder="Enter Address"
+        value={searchAddress}
+        onChangeText={(text) => setSearchAddress(text)}
+      />
+
+      <TouchableOpacity style={{}} onPress={searchWeather}>
+        <Text style={{}}>Search</Text>
+      </TouchableOpacity>
       <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
         {/* Kiểm tra dữ liệu */}
-      {weatherData !== null ? (
-        <>
-        {/* Ảnh thời tiết */}
-        <Image
-          style={styles.weatherImage}
-          source={require("../image/cloudy.jpg")}
-        />
-        {/* Nhiệt độ */}
-        <View style={styles.temperatureContainer}>
-          <View
-            style={styles.temperatureDetails}
-          >
-            <Text style={styles.temperatureText}>{weatherData.current['temp_c']}</Text>
-            <Text style={styles.temperatureUnit}> °C</Text>
-          </View>
-          {/* <Text
+        {weatherData !== null ? (
+          <>
+            {/* Ảnh thời tiết */}
+            <Image
+              style={styles.weatherImage}
+              source={require("../image/cloudy.jpg")}
+            />
+            {/* Nhiệt độ */}
+            <View style={styles.temperatureContainer}>
+              <View style={styles.temperatureDetails}>
+                <Text style={styles.temperatureText}>
+                  {weatherData.current["temp_c"]}
+                </Text>
+                <Text style={styles.temperatureUnit}> °C</Text>
+              </View>
+              {/* <Text
             style={{
               paddingBottom: 25,
               fontSize: 32,
@@ -191,95 +219,111 @@ const Home_screen = (props) => {
           >
             24.4°
           </Text> */}
-        </View>
-        {/* Ngày tháng năm hiện tại*/}
-        <Text style={styles.dateText}>{currentDateTime}</Text>
-        {/* Địa điểm */}
-        <Text style={styles.locationText}>{weatherData.location['name']}</Text>
-        {/* Trạng thái thời tiết */}
-        <Text style={styles.weatherStatusText}>{weatherData.current['condition']['text']}</Text>
-        {/* Chi tiết */}
-        <Text style={styles.detailHeaderText}>DETAIL</Text>
-        <View style={styles.detailContainer}>
-          <View style={styles.detailRow}>
-            {/* Nhiệt độ cảm thấy */}
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/feels_like.png")}
-              />
-              <Text style={styles.detailName}>Feels Like</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['feelslike_c']}</Text>
-                <Text style={styles.detailUnit}> °C</Text>
+            </View>
+            {/* Ngày tháng năm hiện tại*/}
+            <Text style={styles.dateText}>{currentDateTime}</Text>
+            {/* Địa điểm */}
+            <Text style={styles.locationText}>
+              {weatherData.location["name"]}
+            </Text>
+            {/* Trạng thái thời tiết */}
+            <Text style={styles.weatherStatusText}>
+              {weatherData.current["condition"]["text"]}
+            </Text>
+            {/* Chi tiết */}
+            <Text style={styles.detailHeaderText}>DETAIL</Text>
+            <View style={styles.detailContainer}>
+              <View style={styles.detailRow}>
+                {/* Nhiệt độ cảm thấy */}
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/feels_like.png")}
+                  />
+                  <Text style={styles.detailName}>Feels Like</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["feelslike_c"]}
+                    </Text>
+                    <Text style={styles.detailUnit}> °C</Text>
+                  </View>
+                </View>
+                {/* Độ ẩm */}
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/humidity.png")}
+                  />
+                  <Text style={styles.detailName}>Humidity</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["humidity"]}
+                    </Text>
+                    <Text style={styles.detailUnit}> %</Text>
+                  </View>
+                </View>
+                {/* Chỉ số tia UV */}
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/uv_index.png")}
+                  />
+                  <Text style={styles.detailName}>UV Index</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["uv"]}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              {/* Tầm nhìn xa */}
+              <View style={styles.detailRow}>
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/visibility.png")}
+                  />
+                  <Text style={styles.detailName}>Visibility</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["vis_km"]}
+                    </Text>
+                    <Text style={styles.detailUnit}> km</Text>
+                  </View>
+                </View>
+                {/* Tốc độ gió */}
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/wind.png")}
+                  />
+                  <Text style={styles.detailName}>Speed Wind</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["wind_kph"]}
+                    </Text>
+                    <Text style={styles.detailUnit}> km/h</Text>
+                  </View>
+                </View>
+                {/* Áp suất */}
+                <View style={styles.detailBox}>
+                  <Image
+                    style={styles.detailIcon}
+                    source={require("../image/pressure.png")}
+                  />
+                  <Text style={styles.detailName}>Pressure</Text>
+                  <View style={styles.detailAbouts}>
+                    <Text style={styles.detailAbout}>
+                      {weatherData.current["pressure_mb"]}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
-            {/* Độ ẩm */}
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/humidity.png")}
-              />
-              <Text style={styles.detailName}>Humidity</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['humidity']}</Text>
-                <Text style={styles.detailUnit}> %</Text>
-              </View>
-            </View>
-            {/* Chỉ số tia UV */}
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/uv_index.png")}
-              />
-              <Text style={styles.detailName}>UV Index</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['uv']}</Text>
-              </View>
-            </View>
-          </View>
-          {/* Tầm nhìn xa */}
-          <View style={styles.detailRow}>
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/visibility.png")}
-              />
-              <Text style={styles.detailName}>Visibility</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['vis_km']}</Text>
-                <Text style={styles.detailUnit}> km</Text>
-              </View>
-            </View>
-            {/* Tốc độ gió */}
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/wind.png")}
-              />
-              <Text style={styles.detailName}>Speed Wind</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['wind_kph']}</Text>
-                <Text style={styles.detailUnit}> km/h</Text>
-              </View>
-            </View>
-            {/* Áp suất */}
-            <View style={styles.detailBox}>
-              <Image
-                style={styles.detailIcon}
-                source={require("../image/pressure.png")}
-              />
-              <Text style={styles.detailName}>Pressure</Text>
-              <View style={styles.detailAbouts}>
-                <Text style={styles.detailAbout}>{weatherData.current['pressure_mb']}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
           </>
-         ) : (
+        ) : (
           // Hiển thị nếu dữ liệu null
-          <Text style={{alignSelf:'center'}}>Loading weather data...</Text>
+          <Text style={{ alignSelf: "center" }}>Loading weather data...</Text>
         )}
       </ScrollView>
     </View>
