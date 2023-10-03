@@ -12,22 +12,16 @@ import { DrawerItemList, createDrawerNavigator, DrawerContentScrollView } from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react'
 import Setting from './All/views/Setting';
+import getDataLogin from './All/db/getDataLogin';
 
 
 const CustomHeader = () => {
   const [Data, setData] = useState(null);
 
-  useEffect(() => {
-    AsyncStorage.getItem('Data_User', (error, result) => {
-      if (!error) {
-        const user = JSON.parse(result)
-        setData(user);
-        console.log('user from header DrawNav : ' + result + ' ');
-      } else {
-        console.log('error from header DrawNav: ' + error);
-      }
-    });
-  }, [])
+ useEffect(() => {
+   getDataLogin()
+ }, [])
+ 
 
   return (
 
