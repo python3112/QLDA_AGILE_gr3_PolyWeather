@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import firebase from "../db/firebase";
 import { getDatabase, ref, get } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import getDataLogin from "../db/getDataLogin";
 
 const LoginScreen = (props) => {
   const {navigation } = props
@@ -22,6 +23,8 @@ const LoginScreen = (props) => {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [textErr, settextErr] = useState("");
+  const [UserLogin, setUserLogin] = useState(null);
+  const [save, setsave] = useState(false);
   // Modal
   const [isVisible, setIsVisible] = useState(false);
   const closeModal = () => {
@@ -29,8 +32,18 @@ const LoginScreen = (props) => {
   };
 
   //Kết nối firebase
-  useEffect(() => {
+  useEffect( () => {
     firebase();
+    // async () =>{
+    //   if(save){
+    //      Save_Data_User(User);
+    //     console.log('user được lưu : ' +  UserLogin)
+    //     setsave(false); 
+    //  }
+    // }
+
+  
+   
   }, []);
 
   //Check đăng nhập
@@ -51,7 +64,7 @@ const LoginScreen = (props) => {
            
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
-                Save_Data_User(user);
+              Save_Data_User(user);
                navigation.navigate("home");
               //Mật khẩu sai => In ra thông báo
             } else {
@@ -72,18 +85,23 @@ const LoginScreen = (props) => {
       });
   };
 
-  const Save_Data_User = async(user_Login) => {
+  const Save_Data_User = (user_Login) => {
     try {
       const jsonValue = JSON.stringify(user_Login);
-    const kq =  await AsyncStorage.setItem('Data_User', jsonValue);
-    if(kq){
-      console.log("thành công " +  kq)
-    }
+      const kq = AsyncStorage.setItem('Data_User', jsonValue , () => {
+        if(kq){
+          console.log("thành công lưu vào Stroange :  " + jsonValue)
+        }
+        else{
+          return;
+        }
+      });
+    
     } catch (e) {
       console.log("lưu data lỗi :" + e)
     }
+  
   }
-
   return (
     <View style={styles.container}>
       {/* Phần logo */}
@@ -437,4 +455,5 @@ const styles = StyleSheet.create({
     width: 60,
     padding: 5,
   }
+
 });

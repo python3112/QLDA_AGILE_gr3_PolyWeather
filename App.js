@@ -18,20 +18,19 @@ import getDataLogin from './All/db/getDataLogin';
 const CustomHeader = () => {
   const [Data, setData] = useState(null);
 
- useEffect(() => {
-  AsyncStorage.getItem('Data_User', (error, result) => {
-    if (!error) {
-      const user = JSON.parse(result)
-       setData(user)
-      console.log('user from header DrawNav : ' + result + ' ' );
-      return user;
-    } else {
-      console.log('error from header DrawNav: ' + error);
-    }
-  });
-   
- }, [])
- 
+  useEffect(() => {
+      // Lấy dữ liệu từ AsyncStorage
+      AsyncStorage.getItem('Data_User', (error, result) => {
+        if (!error) {
+          const user = JSON.parse(result);
+          setData(user);
+        } else {
+          console.log('Error reading data from AsyncStorage: ' + error);
+        }
+      });
+      
+    }, []);
+
 
   return (
 
@@ -39,20 +38,27 @@ const CustomHeader = () => {
       style={{
         justifyContent: 'center',
         alignItems: 'center',
-        
+
       }}>
-        <Image style={{width:100 , height:100 , borderRadius:50}} source={require('./All/image/snowy.jpg')}>
+      <Image style={{ width: 100, height: 100, borderRadius: 50 }} source={require('./All/image/snowy.jpg')}>
 
-        </Image>
-      <Text
-        style={{ fontSize: 20  , color:'rgba(0, 0, 0 , 0.5)', marginTop:20 }}>{Data.userFullName}#{Data.userAdress}</Text>
+      </Image>
+      {/* <Text
+        style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20 }}>{Data == null ? 'User ' : Data.userFullName
+        }</Text> */}
 
-        <View style={{backgroundColor:'black' , height:1 ,width:400 , marginTop:20 , marginBottom:10}}>
+        {Data ==!  null  ? <Text>
+              đang lload tên 
+        </Text> : <Text>
+          {Data.userFullName}
+          </Text>}
 
-        </View>
+      <View style={{ backgroundColor: 'black', height: 1, width: 400, marginTop: 20, marginBottom: 10 }}>
+
+      </View>
     </View>
 
-    
+
   )
 };
 
