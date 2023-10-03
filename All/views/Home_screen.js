@@ -147,6 +147,9 @@ const Home_screen = (props) => {
   return (
     <View style={styles.container}>
       <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
+        {/* Kiểm tra dữ liệu */}
+      {weatherData !== null ? (
+        <>
         {/* Ảnh thời tiết */}
         <Image
           style={styles.weatherImage}
@@ -266,6 +269,11 @@ const Home_screen = (props) => {
             </View>
           </View>
         </View>
+          </>
+         ) : (
+          // Hiển thị nếu dữ liệu null
+          <Text style={{alignSelf:'center'}}>Loading weather data...</Text>
+        )}
       </ScrollView>
     </View>
   );
