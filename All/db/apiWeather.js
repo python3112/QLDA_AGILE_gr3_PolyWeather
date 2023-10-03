@@ -14,10 +14,10 @@ const fetchWeatherData = async (name) => {
   try {
     const response = await axios.request(options);
     console.log(response.data);
-    return response.data; // You can return the data if needed
+    return response.data; 
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to load weather data'); // You can throw an error if needed
+    throw new Error('Failed to load weather data'); 
   }
 };
 
