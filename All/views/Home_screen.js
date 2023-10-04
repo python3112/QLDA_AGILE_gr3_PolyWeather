@@ -34,12 +34,7 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    if( getDataLogin('home') != null ){
-      console.log("dữ liệu ở home lấy được từ Asyc" + getDataLogin('home'));
-    }else{
-      console.log('lỗi  home')
-    }
-   
+  
     fetchWeatherData()
       .then((data) => {
         setWeatherData(data);
