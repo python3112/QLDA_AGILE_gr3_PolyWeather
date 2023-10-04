@@ -19,17 +19,17 @@ const CustomHeader = () => {
   const [Data, setData] = useState(null);
 
   useEffect(() => {
-      // Lấy dữ liệu từ AsyncStorage
-      AsyncStorage.getItem('Data_User', (error, result) => {
-        if (!error) {
-          const user = JSON.parse(result);
-          setData(user);
-        } else {
-          console.log('Error reading data from AsyncStorage: ' + error);
-        }
-      });
-      
-    }, []);
+    // Lấy dữ liệu từ AsyncStorage
+    AsyncStorage.getItem('Data_User', (error, result) => {
+      if (!error) {
+        const user = JSON.parse(result);
+        setData(user);
+      } else {
+        console.log('Error reading data from AsyncStorage: ' + error);
+      }
+    });
+
+  }, []);
 
 
   return (
@@ -47,12 +47,10 @@ const CustomHeader = () => {
         style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20 }}>{Data == null ? 'User ' : Data.userFullName
         }</Text>
 
-        
-
       <View style={{ backgroundColor: 'black', height: 1, width: 400, marginTop: 20, marginBottom: 10 }}>
 
       </View>
-    </View>
+    </View >
 
 
   )
