@@ -61,7 +61,7 @@ const SignupScreen = (props) => {
   };
 
   const checkRegister = async () => {
-    if (username.length > 0 && password.length > 0 && adress.length > 0 && fullName > 0) {
+    if (username.length > 0 && password.length > 0 && adress.length ) {
 
       if (password === re_password || fullName.length > 20) {
         if (!await checkLogin(username)) {
