@@ -23,6 +23,8 @@ const Home_screen = (props) => {
   const [weatherData, setWeatherData] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
+
   // Mở đóng modal
   const openModal = () => {
     setIsVisible(true);
@@ -68,7 +70,49 @@ const Home_screen = (props) => {
         openModal();
       });
   };
+  // Thay đổi ảnh theo tình trạng thời tiết
+  useEffect(() => {
+    if (weatherData) {
+      const conditionText =
+        weatherData.current["condition"]["text"].toLowerCase();
+      let imagePath = "";
 
+      switch (conditionText) {
+        // Ít mây
+        case "partly cloudy":
+          imagePath = require("../image/partly_cloudy.jpg");
+          break;
+          case "clear":
+          imagePath = require("../image/clear.jpg");
+          break;
+        // Sương mù
+        case "mist":
+          imagePath = require("../image/mist.jpg");
+          break;
+        // Âm u overcast
+        case "overcast":
+          imagePath = require("../image/overcast.jpg");
+          break;
+        // Mưa rải rác
+        case "patchy rain possible":
+          imagePath = require("../image/rainy.jpg");
+          break;
+        case "light rain":
+          imagePath = require("../image/rainy.jpg");
+          break;
+        case "sunny":
+          imagePath = require("../image/sunny.jpg");
+          break;
+
+        default:
+          imagePath = require("../image/cloudy.jpg");
+          break;
+      }
+
+      // Đặt đường dẫn ảnh
+      setSrcImage(imagePath);
+    }
+  }, [weatherData]);
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -303,10 +347,7 @@ const Home_screen = (props) => {
               </TouchableOpacity>
             </View>
             {/* Ảnh thời tiết */}
-            <Image
-              style={styles.weatherImage}
-              source={require("../image/cloudy.jpg")}
-            />
+            <Image style={styles.weatherImage} source={srcImage} />
             {/* Nhiệt độ */}
             <View style={styles.temperatureContainer}>
               <View style={styles.temperatureDetails}>
