@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+
 const fetchWeatherData = async (address) => {
-  if(address == ''){ address = 'hanoi'}; 
+  if(address ==  undefined){
+    address = 'hanoi';
+  }
   const options = {
     method: 'GET',
     url: 'https://weatherapi-com.p.rapidapi.com/current.json',
@@ -14,10 +17,8 @@ const fetchWeatherData = async (address) => {
 
   try {
     const response = await axios.request(options);
-    console.log(response.data);
     return response.data; 
   } catch (error) {
-    console.error(error);
     throw new Error('Failed to load weather data'); 
   }
 };

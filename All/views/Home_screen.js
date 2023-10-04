@@ -9,15 +9,28 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
+  Modal,
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
 import fetchWeatherData from "../db/apiWeather";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const Home_screen = (props) => {
   const { navigation } = props;
   const [searchAddress, setSearchAddress] = useState("");
   const [weatherData, setWeatherData] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Mở đóng modal
+  const openModal = () => {
+    setIsVisible(true);
+  };
+  const closeModal = () => {
+    setIsVisible(false);
+  };
+
   // Lấy kích thước màn hình
   const windowWidth = Dimensions.get("window").width * 0.92;
   const windowWidthDetail = Dimensions.get("window").width * 0.282;
@@ -34,12 +47,6 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    if( getDataLogin('home') != null ){
-      console.log("dữ liệu ở home lấy được từ Asyc" + getDataLogin('home'));
-    }else{
-      console.log('lỗi  home')
-    }
-   
     fetchWeatherData()
       .then((data) => {
         setWeatherData(data);
@@ -48,19 +55,17 @@ const Home_screen = (props) => {
         console.error("Error fetching weather data:", error);
       });
   }, []);
+  // Tìm kiếm
   const searchWeather = () => {
     if (searchAddress.trim() === "") {
-      // Đảm bảo rằng địa chỉ không trống
       return;
     }
-
-    // Gửi yêu cầu tìm kiếm thời tiết với địa chỉ người dùng nhập
     fetchWeatherData(searchAddress)
       .then((data) => {
         setWeatherData(data);
       })
       .catch((error) => {
-        console.error("Error fetching weather data:", error);
+        openModal();
       });
   };
 
@@ -168,55 +173,135 @@ const Home_screen = (props) => {
       fontWeight: "300",
       color: "grey",
     },
+    // Modal
+    messageLogin: {
+      color: "red",
+      alignSelf: "flex-start",
+      marginTop: 10,
+    },
+    containerModal: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    viewModal: {
+      width: "80%",
+      height: 163,
+      backgroundColor: "white",
+      borderRadius: 10,
+      elevation: 10,
+    },
+    headerModal: {
+      backgroundColor: "red",
+      height: 50,
+      flexDirection: "row",
+      alignItems: "center",
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+    },
+    textHeaderModal: {
+      color: "white",
+      fontWeight: "bold",
+      fontSize: 20,
+      marginStart: 15,
+    },
+    bodyModal: {
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      height: 70,
+      borderBottomWidth: 0.4,
+      borderColor: "gray",
+      justifyContent: "center",
+    },
+    btnModal: {
+      borderRadius: 5,
+      borderColor: "grey",
+      marginTop: 5,
+      alignSelf: "flex-end",
+      marginEnd: 10,
+      borderWidth: 1,
+      width: 60,
+      padding: 5,
+    },
   });
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            height: 40,
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <TextInput
-            style={{
-              paddingStart: 10,
-              borderRadius: 5,
-              borderWidth: 1,
-              borderColor: "orange",
-              height: 40,
-              width: "65%",
-              marginEnd: 15,
-              fontSize: 17,
-              fontWeight: "500",
-            }}
-            placeholder="Enter Address"
-            value={searchAddress}
-            onChangeText={(text) => setSearchAddress(text)}
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: "orange",
-              height: 40,
-              borderRadius: 5,
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={searchWeather}
-          >
-            <Text style={{ fontWeight: "bold", fontSize: 17, color: "white" }}>
-              Search
-            </Text>
-          </TouchableOpacity>
+      {/* Thông báo */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.containerModal}>
+          <View style={styles.viewModal}>
+            <View style={styles.headerModal}>
+              <FontAwesome5
+                name="exclamation-triangle"
+                size={30}
+                color="white"
+                style={{ marginStart: 10 }}
+              />
+              <Text style={styles.textHeaderModal}>Error</Text>
+            </View>
+            <View style={styles.bodyModal}>
+              <Text style={{ fontSize: 16 }}>Address not found!</Text>
+            </View>
+            <TouchableOpacity onPress={closeModal} style={styles.btnModal}>
+              <Text style={{ textAlign: "center" }}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        {/* Kiểm tra dữ liệu */}
-        {weatherData !== null ? (
-          <>
+      </Modal>
+      {/* Kiểm tra dữ liệu */}
+      {weatherData !== null ? (
+        <>
+          <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                height: 40,
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <TextInput
+                style={{
+                  paddingStart: 10,
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  borderColor: "orange",
+                  height: 40,
+                  width: "65%",
+                  marginEnd: 15,
+                  fontSize: 17,
+                  fontWeight: "500",
+                }}
+                placeholder="Enter Address"
+                value={searchAddress}
+                onChangeText={(text) => setSearchAddress(text)}
+              />
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "orange",
+                  height: 40,
+                  borderRadius: 5,
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={searchWeather}
+              >
+                <Text
+                  style={{ fontWeight: "bold", fontSize: 17, color: "white" }}
+                >
+                  Search
+                </Text>
+              </TouchableOpacity>
+            </View>
             {/* Ảnh thời tiết */}
             <Image
               style={styles.weatherImage}
@@ -352,16 +437,21 @@ const Home_screen = (props) => {
                 </View>
               </View>
             </View>
-          </>
-        ) : (
-          // Hiển thị nếu dữ liệu null
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <ActivityIndicator size="large" color="orange" />
-          </View>
-        )}
-      </ScrollView>
+          </ScrollView>
+        </>
+      ) : (
+        // Hiển thị nếu dữ liệu null
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="orange" />
+        </View>
+      )}
     </View>
   );
 };
