@@ -201,7 +201,7 @@ const SignupScreen = (props) => {
 
           <View style={styles.viewInPut}>
             <Entypo
-              name="old-phone"
+              name="location"
               size={20}
               color="orange"
               style={{ marginEnd: 10 }}

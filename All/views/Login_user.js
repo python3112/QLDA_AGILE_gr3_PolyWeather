@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import firebase from "../db/firebase";
 import { getDatabase, ref, get } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import getDataLogin from "../db/getDataLogin";
+
 
 const LoginScreen = (props) => {
   const {navigation } = props

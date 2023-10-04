@@ -10,7 +10,7 @@ import {
 import "react-native-gesture-handler";
 import moment from "moment";
 import fetchWeatherData from "../db/apiWeather";
-import getDataLogin from "../db/getDataLogin";
+
 const Home_screen = (props) => {
   const { navigation } = props;
   const [weatherData, setWeatherData] = useState(null);
@@ -30,11 +30,7 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    if( getDataLogin('home') != null ){
-      console.log("dữ liệu ở home lấy được từ Asyc" + getDataLogin('home'));
-    }else{
-      console.log('lỗi  home')
-    }
+    
    
     fetchWeatherData()
       .then((data) => {
