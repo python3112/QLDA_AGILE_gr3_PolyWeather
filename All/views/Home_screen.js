@@ -1,29 +1,36 @@
 import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   Image,
   ScrollView,
-  Dimensions,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Modal,
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
-import fetchWeatherData from "../db/apiWeather";
+import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { styles } from "../css/styleHome";
 
 const Home_screen = (props) => {
   const { navigation } = props;
-  const [searchAddress, setSearchAddress] = useState("");
-  const [weatherData, setWeatherData] = useState(null);
+  const [searchAddress, setSearchAddress] = useState("hanoi");
+  const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
-
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
+
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
   // Mở đóng modal
   const openModal = () => {
@@ -32,10 +39,6 @@ const Home_screen = (props) => {
   const closeModal = () => {
     setIsVisible(false);
   };
-
-  // Lấy kích thước màn hình
-  const windowWidth = Dimensions.get("window").width * 0.92;
-  const windowWidthDetail = Dimensions.get("window").width * 0.282;
   // Lấy ngày
   const [currentDateTime, setCurrentDateTime] = useState(
     moment().format("dddd, MMMM D, YYYY")
@@ -49,12 +52,12 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    fetchWeatherData()
+    fetchWeatherForecast(searchAddress)
       .then((data) => {
-        setWeatherData(data);
+        setWeatherDataForecast(data);
       })
       .catch((error) => {
-        console.error("Error fetching weather data:", error);
+        console.error("Error fetching weather forecast data:", error);
       });
   }, []);
   // Tìm kiếm
@@ -62,19 +65,20 @@ const Home_screen = (props) => {
     if (searchAddress.trim() === "") {
       return;
     }
-    fetchWeatherData(searchAddress)
+    fetchWeatherForecast(searchAddress)
       .then((data) => {
-        setWeatherData(data);
+        setWeatherDataForecast(data);
       })
       .catch((error) => {
         openModal();
       });
   };
+  // Dự báo
   // Thay đổi ảnh theo tình trạng thời tiết
   useEffect(() => {
-    if (weatherData) {
+    if (weatherDataForecast) {
       const conditionText =
-        weatherData.current["condition"]["text"].toLowerCase();
+        weatherDataForecast.current["condition"]["text"].toLowerCase();
       let imagePath = "";
 
       switch (conditionText) {
@@ -82,7 +86,7 @@ const Home_screen = (props) => {
         case "partly cloudy":
           imagePath = require("../image/partly_cloudy.jpg");
           break;
-          case "clear":
+        case "clear":
           imagePath = require("../image/clear.jpg");
           break;
         // Sương mù
@@ -93,13 +97,17 @@ const Home_screen = (props) => {
         case "overcast":
           imagePath = require("../image/overcast.jpg");
           break;
-        // Mưa rải rác
+        // Mưa rải rác Moderate rain
         case "patchy rain possible":
-          imagePath = require("../image/rainy.jpg");
-          break;
+        case "moderate rain":
         case "light rain":
           imagePath = require("../image/rainy.jpg");
           break;
+        // Mưa và sấm sét
+        case "patchy light rain with thunder":
+          imagePath = require("../image/rain_with_thunder.jpg");
+          break;
+        // Nắng
         case "sunny":
           imagePath = require("../image/sunny.jpg");
           break;
@@ -112,163 +120,7 @@ const Home_screen = (props) => {
       // Đặt đường dẫn ảnh
       setSrcImage(imagePath);
     }
-  }, [weatherData]);
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "white",
-      width: "100%",
-    },
-    weatherImage: {
-      alignSelf: "center",
-      width: windowWidth,
-      height: windowWidth,
-      borderRadius: 10,
-    },
-    temperatureContainer: {
-      flexDirection: "row",
-      width: "100%",
-      alignItems: "center",
-    },
-    temperatureDetails: {
-      flexDirection: "row",
-      marginEnd: 15,
-      alignItems: "flex-end",
-    },
-    temperatureText: {
-      fontSize: 68,
-      fontWeight: "100",
-      color: "gray",
-    },
-    temperatureUnit: {
-      fontSize: 40,
-      fontWeight: "100",
-      color: "gray",
-      marginBottom: 12,
-    },
-    degreeText: {
-      fontSize: 32,
-      fontWeight: "100",
-      color: "gray",
-    },
-    dateText: {
-      fontSize: 16,
-      color: "gray",
-    },
-    locationText: {
-      color: "black",
-      fontSize: 28,
-      fontWeight: "bold",
-      marginVertical: 5,
-    },
-    weatherStatusText: {
-      color: "black",
-      fontSize: 16,
-    },
-    detailHeaderText: {
-      color: "black",
-      fontSize: 15,
-      marginTop: 15,
-      fontWeight: "500",
-      marginBottom: 25,
-    },
-    detailBox: {
-      backgroundColor: "#EEEEEE",
-      borderRadius: 5,
-      width: windowWidthDetail,
-      height: windowWidthDetail,
-      alignItems: "center",
-      padding: 10,
-    },
-    detailContainer: {
-      width: "100%",
-      height: windowWidthDetail * 2 + 10,
-      justifyContent: "space-between",
-      flexDirection: "column",
-      marginBottom: 20,
-    },
-    detailRow: {
-      width: "100%",
-      height: 105,
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    detailIcon: {
-      width: 25,
-      height: 25,
-    },
-    detailName: {
-      marginTop: 5,
-    },
-    detailAbouts: {
-      flexDirection: "row",
-      width: "100%",
-      justifyContent: "center",
-      marginTop: 5,
-      alignItems: "center",
-    },
-    detailAbout: {
-      fontSize: 30,
-      color: "black",
-      fontWeight: "400",
-    },
-    detailUnit: {
-      fontSize: 18,
-      fontWeight: "300",
-      color: "grey",
-    },
-    // Modal
-    messageLogin: {
-      color: "red",
-      alignSelf: "flex-start",
-      marginTop: 10,
-    },
-    containerModal: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    viewModal: {
-      width: "80%",
-      height: 163,
-      backgroundColor: "white",
-      borderRadius: 10,
-      elevation: 10,
-    },
-    headerModal: {
-      backgroundColor: "red",
-      height: 50,
-      flexDirection: "row",
-      alignItems: "center",
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    textHeaderModal: {
-      color: "white",
-      fontWeight: "bold",
-      fontSize: 20,
-      marginStart: 15,
-    },
-    bodyModal: {
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      height: 70,
-      borderBottomWidth: 0.4,
-      borderColor: "gray",
-      justifyContent: "center",
-    },
-    btnModal: {
-      borderRadius: 5,
-      borderColor: "grey",
-      marginTop: 5,
-      alignSelf: "flex-end",
-      marginEnd: 10,
-      borderWidth: 1,
-      width: 60,
-      padding: 5,
-    },
-  });
+  }, [weatherDataForecast]);
 
   return (
     <View style={styles.container}>
@@ -300,50 +152,22 @@ const Home_screen = (props) => {
         </View>
       </Modal>
       {/* Kiểm tra dữ liệu */}
-      {weatherData !== null ? (
+      {weatherDataForecast !== null ? (
         <>
           <ScrollView style={{ width: "100%", paddingHorizontal: 16 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                width: "100%",
-                height: 40,
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
+            {/* Tìm kiếm */}
+            <View style={styles.containerSearch}>
               <TextInput
-                style={{
-                  paddingStart: 10,
-                  borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: "orange",
-                  height: 40,
-                  width: "65%",
-                  marginEnd: 15,
-                  fontSize: 17,
-                  fontWeight: "500",
-                }}
+                style={styles.tipSearch}
                 placeholder="Enter Address"
                 value={searchAddress}
                 onChangeText={(text) => setSearchAddress(text)}
               />
               <TouchableOpacity
-                style={{
-                  backgroundColor: "orange",
-                  height: 40,
-                  borderRadius: 5,
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                style={styles.btnSearch}
                 onPress={searchWeather}
               >
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 17, color: "white" }}
-                >
-                  Search
-                </Text>
+                <Text style={styles.textSearch}>Search</Text>
               </TouchableOpacity>
             </View>
             {/* Ảnh thời tiết */}
@@ -352,41 +176,45 @@ const Home_screen = (props) => {
             <View style={styles.temperatureContainer}>
               <View style={styles.temperatureDetails}>
                 <Text style={styles.temperatureText}>
-                  {weatherData.current["temp_c"]}
+                  {weatherDataForecast.current["temp_c"]}
                 </Text>
                 <Text style={styles.temperatureUnit}> °C</Text>
               </View>
-              {/* <Text
-            style={{
-              paddingBottom: 25,
-              fontSize: 32,
-              fontWeight: "100",
-              color: "gray",
-            }}
-          >
-            29.6°
-          </Text>
-          <Text style={styles.degreeText}>/</Text>
-          <Text
-            style={{
-              paddingTop: 25,
-              fontSize: 32,
-              fontWeight: "100",
-              color: "gray",
-            }}
-          >
-            24.4°
-          </Text> */}
+              <Text
+                style={{
+                  paddingBottom: 25,
+                  fontSize: 32,
+                  fontWeight: "100",
+                  color: "gray",
+                }}
+              >
+                {weatherDataForecast["forecast"]["forecastday"]["0"]["day"][
+                  "maxtemp_c"
+                ] + "°"}
+              </Text>
+              <Text style={styles.degreeText}>/</Text>
+              <Text
+                style={{
+                  paddingTop: 25,
+                  fontSize: 32,
+                  fontWeight: "100",
+                  color: "gray",
+                }}
+              >
+                {weatherDataForecast["forecast"]["forecastday"]["0"]["day"][
+                  "mintemp_c"
+                ] + "°"}
+              </Text>
             </View>
             {/* Ngày tháng năm hiện tại*/}
             <Text style={styles.dateText}>{currentDateTime}</Text>
             {/* Địa điểm */}
             <Text style={styles.locationText}>
-              {weatherData.location["name"]}
+              {weatherDataForecast.location["name"]}
             </Text>
             {/* Trạng thái thời tiết */}
             <Text style={styles.weatherStatusText}>
-              {weatherData.current["condition"]["text"]}
+              {weatherDataForecast.current["condition"]["text"]}
             </Text>
             {/* Chi tiết */}
             <Text style={styles.detailHeaderText}>DETAIL</Text>
@@ -400,8 +228,8 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>Feels Like</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["feelslike_c"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["feelslike_c"]}
                     </Text>
                     <Text style={styles.detailUnit}> °C</Text>
                   </View>
@@ -414,8 +242,8 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>Humidity</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["humidity"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["humidity"]}
                     </Text>
                     <Text style={styles.detailUnit}> %</Text>
                   </View>
@@ -428,8 +256,8 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>UV Index</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["uv"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["uv"]}
                     </Text>
                   </View>
                 </View>
@@ -443,8 +271,8 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>Visibility</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["vis_km"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["vis_km"]}
                     </Text>
                     <Text style={styles.detailUnit}> km</Text>
                   </View>
@@ -457,8 +285,8 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>Speed Wind</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["wind_kph"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["wind_kph"]}
                     </Text>
                     <Text style={styles.detailUnit}> km/h</Text>
                   </View>
@@ -471,12 +299,49 @@ const Home_screen = (props) => {
                   />
                   <Text style={styles.detailName}>Pressure</Text>
                   <View style={styles.detailAbouts}>
-                    <Text style={styles.detailAbout}>
-                      {weatherData.current["pressure_mb"]}
+                    <Text style={styles.detailValue}>
+                      {weatherDataForecast.current["pressure_mb"]}
                     </Text>
                   </View>
                 </View>
               </View>
+            </View>
+            <Text style={styles.detailHeaderText}>FORE CAST</Text>
+            <View style={styles.forecastContainer}>
+              {weatherDataForecast?.forecast?.forecastday
+                ?.slice(0, 3)
+                .map((day, index) => (
+                  <View key={index} style={styles.forecastBox}>
+                    <Text style={styles.forecastText}>
+                      {day.day["avgtemp_c"] + "°C"}
+                    </Text>
+                    <Text style={styles.forecastHumidity}>
+                      {day.day["avghumidity"] + "%"}
+                    </Text>
+                    <Image
+                      style={styles.forecastIcon}
+                      source={{ uri: "http:" + day.day["condition"]["icon"] }}
+                    />
+                    <Text style={styles.forecastWind}>
+                      {day.day["maxwind_kph"] + " km/h"}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.forecastDay,
+                        {
+                          backgroundColor:
+                            index === 0
+                              ? "#124DA3"
+                              : index === 1
+                              ? "#F37022"
+                              : "#4EB748",
+                        },
+                      ]}
+                    >
+                      {daysOfWeek[new Date(day.date).getDay()]}
+                    </Text>
+                  </View>
+                ))}
             </View>
           </ScrollView>
         </>
