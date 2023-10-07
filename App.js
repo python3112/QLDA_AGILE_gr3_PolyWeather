@@ -16,7 +16,7 @@ import Setting from './All/views/Setting';
 
 
 const CustomHeader = () => {
-  const [Data, setData] = useState(null);
+  const [Data, setData] = useState({});
 
   useEffect(() => {
     // Lấy dữ liệu từ AsyncStorage
@@ -24,6 +24,7 @@ const CustomHeader = () => {
       if (!error) {
         const user = JSON.parse(result);
         setData(user);
+      
       } else {
         console.log('Error reading data from AsyncStorage: ' + error);
       }
@@ -31,23 +32,32 @@ const CustomHeader = () => {
 
   }, []);
 
+  console.log(Data);
 
   return (
 
     <View
       style={{
+        flexDirection:'column',
         justifyContent: 'center',
         alignItems: 'center',
-
+       
       }}>
-      <Image style={{ width: 100, height: 100, borderRadius: 50 }} source={require('./All/image/snowy.jpg')}>
+      <Image style={{ width: 100, height: 100, borderRadius: 50 , }} source={require('./All/image/snowy.jpg')}>
 
       </Image>
-      <Text
-        style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20 }}>{Data == null ? 'User ' : Data.userFullName
-        }</Text>
 
-      <View style={{ backgroundColor: 'black', height: 1, width: 400, marginTop: 20, marginBottom: 10 }}>
+      <View style={{flexDirection:'row'}}>
+      <Text
+        style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20  , fontWeight:'bold'}}>{Data == null ? 'User ' : Data.userFullName
+        }</Text>
+        <Text
+        style={{ fontSize: 10, color: 'rgba(255, 0, 0 , 0.9)', marginTop: 20 }}>{Data.userStatus == false ? ' Nomal' : ' Vip'
+        }</Text>
+      </View>
+      
+
+      <View style={{ backgroundColor: 'black', height: 1, }}>
 
       </View>
     </View >
