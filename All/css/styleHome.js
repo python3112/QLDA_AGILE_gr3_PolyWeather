@@ -57,10 +57,9 @@ export const styles = StyleSheet.create({
   },
   detailHeaderText: {
     color: "black",
-    fontSize: 15,
-    marginTop: 15,
+    fontSize: 16,
     fontWeight: "500",
-    marginBottom: 15,
+    marginVertical:10
   },
   detailBox: {
     backgroundColor: "#EEEEEE",

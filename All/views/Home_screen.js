@@ -59,13 +59,21 @@ const Home_screen = (props) => {
       filteredHourlyForecast.push(...additionalHours);
     }
   }
+  const calculateSunMoon = (startTime, endTime) => {
+    const start = moment(startTime, "hh:mmA");
+    const end = moment(endTime, "hh:mmA");
+    const duration = moment.duration(end.diff(start));
 
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+
+    return { hours, minutes };
+  };
   // Render thông tin hàng giờ
   const renderHourlyForecast = () => {
     if (filteredHourlyForecast && filteredHourlyForecast.length > 0) {
       return (
         <FlatList
-      
           data={filteredHourlyForecast}
           horizontal
           keyExtractor={(item, index) => index.toString()}
@@ -74,12 +82,14 @@ const Home_screen = (props) => {
               style={{ marginEnd: 5, padding: 5, alignItems: "center" }}
               key={index}
             >
-              <Text style={{fontSize:16,fontWeight:'500' }} >{moment(item.time).format("HH:mm")}</Text>
+              <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                {moment(item.time).format("HH:mm")}
+              </Text>
               <Image
                 style={styles.forecastIcon}
                 source={{ uri: "http:" + item.condition.icon }}
               />
-              <Text style={{fontSize:16 }}>{item.temp_c}°</Text>
+              <Text style={{ fontSize: 16 }}>{item.temp_c}°</Text>
             </View>
           )}
         />
@@ -368,6 +378,7 @@ const Home_screen = (props) => {
                 width: "100%",
                 backgroundColor: "#eeeeee",
                 padding: 10,
+                borderRadius: 5,
               }}
             >
               <Text style={{ fontSize: 17, fontWeight: "500" }}>Hourly</Text>
@@ -382,12 +393,13 @@ const Home_screen = (props) => {
               {renderHourlyForecast()}
             </View>
 
-              <View
+            <View
               style={{
                 width: "100%",
                 backgroundColor: "#eeeeee",
                 padding: 10,
-                marginVertical:10,
+                marginVertical: 10,
+                borderRadius: 5,
               }}
             >
               <Text style={{ fontSize: 17, fontWeight: "500" }}>Daily</Text>
@@ -400,33 +412,240 @@ const Home_screen = (props) => {
                 }}
               />
               <View style={styles.forecastContainer}>
-
-              {weatherDataForecast?.forecast?.forecastday
-                ?.slice(0, 3)
-                .map((day, index) => (
-                  <View key={index} style={styles.forecastBox}>
-                     <Text style={styles.forecastDay}>
-                      {daysOfWeek[new Date(day.date).getDay()]}
+                {weatherDataForecast?.forecast?.forecastday
+                  ?.slice(0, 3)
+                  .map((day, index) => (
+                    <View key={index} style={styles.forecastBox}>
+                      <Text style={styles.forecastDay}>
+                        {daysOfWeek[new Date(day.date).getDay()]}
+                      </Text>
+                      <Image
+                        style={styles.forecastIcon}
+                        source={{ uri: "http:" + day.day["condition"]["icon"] }}
+                      />
+                      <Text style={styles.forecastTextMax}>
+                        {day.day["maxtemp_c"] + "°"}
+                      </Text>
+                      <Text style={styles.forecastTextMin}>
+                        {day.day["mintemp_c"] + "°"}
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+            </View>
+            {/* Mặt trời và mặt trăng */}
+            <Text style={styles.detailHeaderText}>Sun & Moon</Text>
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "#eeeeee",
+                padding: 10,
+                borderRadius: 5,
+                marginBottom: 20,
+                flexDirection: "row",
+              }}
+            >
+              {/* Mặt trời */}
+              <View
+                style={{ width: "50%", borderRightWidth: 1, paddingEnd: 10 }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingBottom: 12,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <FontAwesome5
+                    name="sun"
+                    size={50}
+                    color="orange"
+                    style={{}}
+                  />
+                  <View style={{ justifyContent: "space-evenly" }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        textAlign: "right",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {
+                        calculateSunMoon(
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["sunrise"],
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["sunset"]
+                        ).hours
+                      }{" "}
+                      hours
                     </Text>
-                    <Image
-                      style={styles.forecastIcon}
-                      source={{ uri: "http:" + day.day["condition"]["icon"] }}
-                    />
-                    <Text style={styles.forecastTextMax}>
-                      {day.day["maxtemp_c"] + "°"}
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        textAlign: "right",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {
+                        calculateSunMoon(
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["sunrise"],
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["sunset"]
+                        ).minutes
+                      }{" "}
+                      minutes
                     </Text>
-                    <Text style={styles.forecastTextMin}>
-                      {day.day["mintemp_c"] + "°"}
-                    </Text>
-                   
-                    
-                   
-                   
                   </View>
-                ))}
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderColor: "grey",
+                    borderTopWidth: 0.5,
+                    paddingVertical: 10,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    Sunrire
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    {moment(
+                      weatherDataForecast["forecast"]["forecastday"]["0"][
+                        "astro"
+                      ]["sunrise"],
+                      "hh:mmA"
+                    ).format("HH:mm")}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderColor: "grey",
+                    borderTopWidth: 0.5,
+                    paddingVertical: 10,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    Sunset
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    {moment(
+                      weatherDataForecast["forecast"]["forecastday"]["0"][
+                        "astro"
+                      ]["sunset"],
+                      "hh:mmA"
+                    ).format("HH:mm")}
+                  </Text>
+                </View>
+              </View>
+              {/* Mặt trăng */}
+              <View style={{ width: "50%", paddingStart: 10 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingBottom: 12,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <FontAwesome5
+                    name="moon"
+                    size={50}
+                    color="#79CDCD"
+                    style={{}}
+                  />
+                  <View style={{ justifyContent: "space-evenly" }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        textAlign: "right",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {
+                        calculateSunMoon(
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["moonrise"],
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["moonset"]
+                        ).hours
+                      }{" "}
+                      hours
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        textAlign: "right",
+                        fontWeight: "500",
+                      }}
+                    >
+                      {
+                        calculateSunMoon(
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["moonrise"],
+                          weatherDataForecast["forecast"]["forecastday"]["0"][
+                            "astro"
+                          ]["moonset"]
+                        ).minutes
+                      }{" "}
+                      minutes
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderColor: "grey",
+                    borderTopWidth: 0.5,
+                    paddingVertical: 10,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    Moonrire
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    {moment(
+                      weatherDataForecast["forecast"]["forecastday"]["0"][
+                        "astro"
+                      ]["moonrise"],
+                      "hh:mmA"
+                    ).format("HH:mm")}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderColor: "grey",
+                    borderTopWidth: 0.5,
+                    paddingVertical: 10,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    Moonset
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                    {moment(
+                      weatherDataForecast["forecast"]["forecastday"]["0"][
+                        "astro"
+                      ]["moonset"],
+                      "hh:mmA"
+                    ).format("HH:mm")}
+                  </Text>
+                </View>
+              </View>
             </View>
-            </View>
-
           </ScrollView>
         </>
       ) : (
