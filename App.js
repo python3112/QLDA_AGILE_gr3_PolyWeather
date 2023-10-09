@@ -52,7 +52,7 @@ const CustomHeader = () => {
         style={{ fontSize: 20, color: 'rgba(0, 0, 0 , 0.5)', marginTop: 20  , fontWeight:'bold'}}>{Data == null ? 'User ' : Data.userFullName
         }</Text>
         <Text
-        style={{ fontSize: 10, color: 'rgba(255, 0, 0 , 0.9)', marginTop: 20 }}>{Data.userStatus == false ? ' Nomal' : ' Vip'
+        style={{ fontSize: 10, color: 'rgba(255, 0, 0 , 0.9)', marginTop: 20 }}>{Data.userStatus == false ? ' Normal' : ' Vip'
         }</Text>
       </View>
       

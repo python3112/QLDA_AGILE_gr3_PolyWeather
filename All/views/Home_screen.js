@@ -14,6 +14,7 @@ import moment from "moment";
 import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
+import { FlatList } from "react-native-gesture-handler";
 
 const Home_screen = (props) => {
   const { navigation } = props;
@@ -21,7 +22,6 @@ const Home_screen = (props) => {
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
-
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -32,6 +32,62 @@ const Home_screen = (props) => {
     "Saturday",
   ];
 
+  const currentTime = moment();
+  const startDateTime = currentTime.clone().add(0, "hour");
+  const endDateTime = currentTime.clone().add(23, "hours");
+
+  const filteredHourlyForecast =
+    weatherDataForecast?.forecast?.forecastday[0]?.hour?.filter((hourData) => {
+      const hourDateTime = moment(hourData.time);
+      return hourDateTime.isBetween(startDateTime, endDateTime);
+    });
+
+  if (filteredHourlyForecast && filteredHourlyForecast.length < 24) {
+    // Không đủ 24 giờ trong filteredHourlyForecast, nên tăng chỉ số của forecastday lên 1
+    const nextDayForecast = weatherDataForecast?.forecast?.forecastday[1]?.hour;
+
+    // Kiểm tra xem nextDayForecast có tồn tại và có đủ giờ không
+    if (
+      nextDayForecast &&
+      nextDayForecast.length >= 24 - filteredHourlyForecast.length
+    ) {
+      // Lấy các giờ còn thiếu từ nextDayForecast và thêm vào filteredHourlyForecast
+      const additionalHours = nextDayForecast.slice(
+        0,
+        24 - filteredHourlyForecast.length
+      );
+      filteredHourlyForecast.push(...additionalHours);
+    }
+  }
+
+  // Render thông tin hàng giờ
+  const renderHourlyForecast = () => {
+    if (filteredHourlyForecast && filteredHourlyForecast.length > 0) {
+      return (
+        <FlatList
+      
+          data={filteredHourlyForecast}
+          horizontal
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <View
+              style={{ marginEnd: 5, padding: 5, alignItems: "center" }}
+              key={index}
+            >
+              <Text style={{fontSize:16,fontWeight:'500' }} >{moment(item.time).format("HH:mm")}</Text>
+              <Image
+                style={styles.forecastIcon}
+                source={{ uri: "http:" + item.condition.icon }}
+              />
+              <Text style={{fontSize:16 }}>{item.temp_c}°</Text>
+            </View>
+          )}
+        />
+      );
+    }
+
+    return null;
+  };
   // Mở đóng modal
   const openModal = () => {
     setIsVisible(true);
@@ -307,42 +363,70 @@ const Home_screen = (props) => {
               </View>
             </View>
             <Text style={styles.detailHeaderText}>FORE CAST</Text>
-            <View style={styles.forecastContainer}>
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "#eeeeee",
+                padding: 10,
+              }}
+            >
+              <Text style={{ fontSize: 17, fontWeight: "500" }}>Hourly</Text>
+              <View
+                style={{
+                  width: "100%",
+                  height: 1,
+                  backgroundColor: "gray",
+                  marginTop: 5,
+                }}
+              />
+              {renderHourlyForecast()}
+            </View>
+
+              <View
+              style={{
+                width: "100%",
+                backgroundColor: "#eeeeee",
+                padding: 10,
+                marginVertical:10,
+              }}
+            >
+              <Text style={{ fontSize: 17, fontWeight: "500" }}>Daily</Text>
+              <View
+                style={{
+                  width: "100%",
+                  height: 1,
+                  backgroundColor: "gray",
+                  marginTop: 5,
+                }}
+              />
+              <View style={styles.forecastContainer}>
+
               {weatherDataForecast?.forecast?.forecastday
                 ?.slice(0, 3)
                 .map((day, index) => (
                   <View key={index} style={styles.forecastBox}>
-                    <Text style={styles.forecastText}>
-                      {day.day["avgtemp_c"] + "°C"}
-                    </Text>
-                    <Text style={styles.forecastHumidity}>
-                      {day.day["avghumidity"] + "%"}
+                     <Text style={styles.forecastDay}>
+                      {daysOfWeek[new Date(day.date).getDay()]}
                     </Text>
                     <Image
                       style={styles.forecastIcon}
                       source={{ uri: "http:" + day.day["condition"]["icon"] }}
                     />
-                    <Text style={styles.forecastWind}>
-                      {day.day["maxwind_kph"] + " km/h"}
+                    <Text style={styles.forecastTextMax}>
+                      {day.day["maxtemp_c"] + "°"}
                     </Text>
-                    <Text
-                      style={[
-                        styles.forecastDay,
-                        {
-                          backgroundColor:
-                            index === 0
-                              ? "#124DA3"
-                              : index === 1
-                              ? "#F37022"
-                              : "#4EB748",
-                        },
-                      ]}
-                    >
-                      {daysOfWeek[new Date(day.date).getDay()]}
+                    <Text style={styles.forecastTextMin}>
+                      {day.day["mintemp_c"] + "°"}
                     </Text>
+                   
+                    
+                   
+                   
                   </View>
                 ))}
             </View>
+            </View>
+
           </ScrollView>
         </>
       ) : (
