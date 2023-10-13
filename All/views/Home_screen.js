@@ -373,7 +373,9 @@ const Home_screen = (props) => {
                 </View>
               </View>
             </View>
+            {/* Dự báo */}
             <Text style={styles.detailHeaderText}>FORE CAST</Text>
+            {/* Dự báo theo giờ */}
             <View
               style={{
                 width: "100%",
@@ -393,7 +395,7 @@ const Home_screen = (props) => {
               />
               {renderHourlyForecast()}
             </View>
-
+                {/* Dự báo theo ngày */}
             <View
               style={{
                 width: "100%",
