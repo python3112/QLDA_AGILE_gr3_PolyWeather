@@ -32,21 +32,21 @@ const Home_screen = (props) => {
     "Saturday",
   ];
 
+  // Chức năng dự báo 24h tiếp theo tính từ giờ hiện tại
   const currentTime = moment();
   const startDateTime = currentTime.clone().add(0, "hour");
   const endDateTime = currentTime.clone().add(23, "hours");
-
+  // Lấy ra những giờ tiếp theo của ngày hiện tại
   const filteredHourlyForecast =
     weatherDataForecast?.forecast?.forecastday[0]?.hour?.filter((hourData) => {
       const hourDateTime = moment(hourData.time);
       return hourDateTime.isBetween(startDateTime, endDateTime);
     });
-
+  // Lấy ra những giờ tiếp theo của ngày tiếp theo nếu chưa đủ 24h
   if (filteredHourlyForecast && filteredHourlyForecast.length < 24) {
     // Không đủ 24 giờ trong filteredHourlyForecast, nên tăng chỉ số của forecastday lên 1
     const nextDayForecast = weatherDataForecast?.forecast?.forecastday[1]?.hour;
-
-    // Kiểm tra xem nextDayForecast có tồn tại và có đủ giờ không
+    // Kiểm tra xem nextDayForecast có tồn tại và có đủ 24 giờ không
     if (
       nextDayForecast &&
       nextDayForecast.length >= 24 - filteredHourlyForecast.length
@@ -59,6 +59,7 @@ const Home_screen = (props) => {
       filteredHourlyForecast.push(...additionalHours);
     }
   }
+  // Tính tổng thời gian mặt trời,mặt trăng từ lúc xuất hiện đến khi lặn
   const calculateSunMoon = (startTime, endTime) => {
     const start = moment(startTime, "hh:mmA");
     const end = moment(endTime, "hh:mmA");
@@ -456,11 +457,9 @@ const Home_screen = (props) => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <FontAwesome5
-                    name="sun"
-                    size={50}
-                    color="orange"
-                    style={{}}
+                   <Image
+                    style={{ width: 60, height: 60 }}
+                    source={require("../image/sun.png")}
                   />
                   <View style={{ justifyContent: "space-evenly" }}>
                     <Text
@@ -555,12 +554,11 @@ const Home_screen = (props) => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <FontAwesome5
-                    name="moon"
-                    size={50}
-                    color="#79CDCD"
-                    style={{}}
+                  <Image
+                    style={{ width: 60, height: 60 }}
+                    source={require("../image/moon.png")}
                   />
+
                   <View style={{ justifyContent: "space-evenly" }}>
                     <Text
                       style={{
