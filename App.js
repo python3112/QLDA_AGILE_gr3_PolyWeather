@@ -1,23 +1,19 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet, Text, View, Image } from "react-native";
-import LoginScreen from "./All/views/Login_user";
-import Splash_screen from "./All/views/Splash_screen";
-import SignupScreen from "./All/views/Signup_user";
-import Home_screen from "./All/views/Home_screen";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import {
-  DrawerItemList,
-  createDrawerNavigator,
-  DrawerContentScrollView,
-} from "@react-navigation/drawer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState, useEffect } from "react";
-import Setting from "./All/views/Setting";
-import Favorite_address_screen from "./All/views/Favorite_address_screen";
-Favorite_address_screen
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TouchableOpacityBase } from 'react-native';
+import LoginScreen from './All/views/Login_user';
+import Splash_screen from './All/views/Splash_screen';
+import SignupScreen from './All/views/Signup_user';
+import Home_screen from './All/views/Home_screen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { DrawerItemList, createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from 'react'
+import Setting from './All/views/Setting';
+import Favorite_address_screen from './All/views/Favorite_address_screen';
+
 
 const CustomHeader = () => {
   const [Data, setData] = useState({});
@@ -28,6 +24,7 @@ const CustomHeader = () => {
       if (!error) {
         const user = JSON.parse(result);
         setData(user);
+
       } else {
         console.log("Error reading data from AsyncStorage: " + error);
       }
@@ -38,56 +35,79 @@ const CustomHeader = () => {
   return (
     <View
       style={{
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Image
-        style={{ width: 100, height: 100, borderRadius: 50 }}
-        source={require("./All/image/snowy.jpg")}
-      ></Image>
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,165,0 , 0.5)'
 
-      <View style={{ flexDirection: "row" }}>
+      }}>
+      <Image style={{ width: 100, height: 100, borderRadius: 50, marginTop: '10%' }} source={require('./All/image/snowy.jpg')}>
+
+      </Image>
+
+      <View style={{ flexDirection: 'row', marginBottom: '5%' }}>
         <Text
-          style={{
-            fontSize: 20,
-            color: "rgba(0, 0, 0 , 0.5)",
-            marginTop: 20,
-            fontWeight: "bold",
-          }}
-        >
-          {Data == null ? "User " : Data.userFullName}
-        </Text>
+          style={{ fontSize: 20, color: 'rgba(255, 255, 255 , 1)', marginTop: 20, fontWeight: 'bold' }}>{Data == null ? 'User ' : Data.userFullName
+          }</Text>
         <Text
-          style={{
-            fontSize: 10,
-            color: "rgba(255, 0, 0 , 0.9)",
-            marginTop: 20,
-          }}
-        >
-          {Data.userStatus == false ? " Normal" : " Vip"}
-        </Text>
+          style={{ fontSize: 12, color: 'rgba(255, 0, 0 , 0.9)', marginTop: 20 }}>{Data.userStatus == false ? ' Normal' : ' Vip'
+          }</Text>
       </View>
 
-      <View style={{ backgroundColor: "black", height: 1 }}></View>
-    </View>
-  );
+
+      <View style={{ backgroundColor: 'black', height: 1, width: '100%' }}>
+
+      </View>
+    </View >
+
+
+  )
 };
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => (
-  <DrawerContentScrollView {...props}>
+  <View style={{ height: '100%', }}>
     <CustomHeader />
-    <DrawerItemList {...props} />
-  </DrawerContentScrollView>
+    <View style={{flex:1}}>
+      <DrawerContentScrollView contentContainerStyle={{}} {...props}>
+
+        <DrawerItemList {...props} />
+    
+      </DrawerContentScrollView>
+    </View>
+    <View style={{marginBottom:'5%'}}>
+          <TouchableOpacity
+            style={{
+              width: '90%',
+              paddingVertical: 15,
+              marginStart: '5%',
+              borderColor:'rgb(255, 0, 0)',
+              borderWidth:1.5,
+              borderRadius:10,
+              
+            }}
+            onPress={() => {
+                  
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+               <AntDesign name="logout" size={23} color='black' />
+              <Text style={{color:'black' , fontWeight:'bold' , marginStart:10}}>Sign Out</Text>
+            </View>
+
+          </TouchableOpacity>
+        </View>
+  </View>
 );
 
 function DrawerNav() {
   return (
     <Drawer.Navigator
-      screenOptions={{}}
+      screenOptions={{
+        drawerActiveBackgroundColor: '#FFA500',
+        drawerActiveTintColor: 'white'
+      }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
@@ -96,19 +116,19 @@ function DrawerNav() {
         options={{
           drawerLabel: "Home",
           title: "Home",
-          drawerIcon: () => (
-            <Ionicons name="home-outline" size={23} color="black" />
+          drawerIcon: ({ color }) => (
+            <Ionicons name="home-outline" size={23} color={color} />
           ),
         }}
       />
- <Drawer.Screen
+      <Drawer.Screen
         name="Favorite"
         component={Favorite_address_screen}
         options={{
           drawerLabel: "Favorite address",
           title: "Favorite address",
-          drawerIcon: () => (
-            <Ionicons name="heart-outline" size={23} color="black" />
+          drawerIcon: ({ color }) => (
+            <Ionicons name="heart-outline" size={23} color={color} />
           ),
         }}
       />
@@ -118,12 +138,12 @@ function DrawerNav() {
         options={{
           drawerLabel: "Setting Account",
           title: "Setting Account",
-          drawerIcon: () => (
-            <AntDesign name="setting" size={23} color="black" />
+          drawerIcon: ({ color }) => (
+            <AntDesign name="setting" size={23} color={color} />
           ),
         }}
       />
-     
+
     </Drawer.Navigator>
   );
 }

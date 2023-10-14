@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const LoginScreen = (props) => {
-  const {navigation } = props
+  const {navigation} = props
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -55,15 +55,18 @@ const LoginScreen = (props) => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const users = snapshot.val();
+          
+          
           // Kiểm tra tài khoản có tồn tại không
           const user = Object.values(users).find(
-            (userData) => userData.username === username
+            (userData) => userData.username === username,
           );
           //Kiểm tra mật khẩu
           if (user) {
            
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
+              
               Save_Data_User(user);
                navigation.navigate("home");
               //Mật khẩu sai => In ra thông báo
