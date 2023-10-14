@@ -90,7 +90,6 @@ const LoginScreen = (props) => {
       const jsonValue = JSON.stringify(user_Login);
       const kq = AsyncStorage.setItem('Data_User', jsonValue , () => {
         if(kq){
-          console.log("thành công lưu vào Stroange :  " + jsonValue)
         }
         else{
           return;

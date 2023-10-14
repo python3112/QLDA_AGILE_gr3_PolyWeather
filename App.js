@@ -34,7 +34,6 @@ const CustomHeader = () => {
     });
   }, []);
 
-  console.log(Data);
 
   return (
     <View

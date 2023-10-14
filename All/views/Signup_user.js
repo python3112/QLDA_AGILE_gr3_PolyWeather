@@ -39,7 +39,7 @@ const SignupScreen = (props) => {
   const checkLogin = async (name) => {
     const db = getDatabase();
     const userRef = ref(db, 'users');
-
+    
     try {
       const snapshot = await get(userRef);
 

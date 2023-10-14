@@ -120,7 +120,6 @@ export const styles = StyleSheet.create({
   },
   viewModal: {
     width: "80%",
-    height: 163,
     backgroundColor: "white",
     borderRadius: 10,
     elevation: 10,
@@ -147,15 +146,20 @@ export const styles = StyleSheet.create({
     borderColor: "gray",
     justifyContent: "center",
   },
+  footerModal: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderColor: "gray",
+    justifyContent: "space-around",
+    flexDirection:'row'
+  },
   btnModal: {
     borderRadius: 5,
     borderColor: "grey",
-    marginTop: 5,
     alignSelf: "flex-end",
-    marginEnd: 10,
     borderWidth: 1,
     width: 60,
-    padding: 5,
+    paddingHorizontal:5,paddingVertical:8
   },
   //Fore cast
   forecastContainer: {

@@ -22,8 +22,4 @@ export default function firebase() {
         const app = initializeApp(firebaseConfig);
         console.log("Kết nối  firebase thành công");
       }
-
-
-
-
 }

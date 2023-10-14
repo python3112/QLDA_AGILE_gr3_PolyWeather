@@ -15,13 +15,24 @@ import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
 import { FlatList } from "react-native-gesture-handler";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDatabase, ref, set, push, get, child } from "firebase/database";
+
+import firebase from "../db/firebase";
 
 const Home_screen = (props) => {
   const { navigation } = props;
-  const [searchAddress, setSearchAddress] = useState("hanoi");
+  const _ = require('lodash');
+  const [searchAddress, setSearchAddress] = useState("Hanoi");
+  const [userNameLogin, setUserNameLogin] = useState('null');
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [checkFavorite, setCheckFavorite] = useState(false);
+  const [isVisibleYT, setIsVisibleYT] = useState(false);
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
+  const [imageFovirite, setImageFavorite] = useState(
+    require("../image/heart_one.png")
+  );
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -31,7 +42,29 @@ const Home_screen = (props) => {
     "Friday",
     "Saturday",
   ];
+ 
+  useEffect(() => {
+    const getStoredUsername = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('Data_User');
+        if (jsonValue !== null) {
+          const data = JSON.parse(jsonValue);
+          if (data.username) {
+            setUserNameLogin(data.username);
+          }
+        } else {
+          console.log('Không tìm thấy dữ liệu.');
+          return null;
+        }
+      } catch (e) {
+        console.log("Lỗi khi đọc dữ liệu: ", e);
+        return null;
+      }
+    };
 
+    getStoredUsername(); // Gọi hàm ở đây để nó tự chạy khi vào màn hình
+  }, []);
+  
   // Chức năng dự báo 24h tiếp theo tính từ giờ hiện tại
   const currentTime = moment();
   const startDateTime = currentTime.clone().add(0, "hour");
@@ -106,6 +139,13 @@ const Home_screen = (props) => {
   const closeModal = () => {
     setIsVisible(false);
   };
+    // Mở đóng modal yêu thích
+    const openModalYT = () => {
+      setIsVisibleYT(true);
+    };
+    const closeModalYT = () => {
+      setIsVisibleYT(false);
+    };
   // Lấy ngày
   const [currentDateTime, setCurrentDateTime] = useState(
     moment().format("dddd, MMMM D, YYYY")
@@ -140,6 +180,11 @@ const Home_screen = (props) => {
         openModal();
       });
   };
+  // Xác nhận xóa
+  const confirmDelete =(userNameLogin,address)=>{
+    removeFavoriteLocationByUsername(userNameLogin,address);
+    closeModalYT();
+  }
   // Dự báo
   // Thay đổi ảnh theo tình trạng thời tiết
   useEffect(() => {
@@ -188,7 +233,126 @@ const Home_screen = (props) => {
       setSrcImage(imagePath);
     }
   }, [weatherDataForecast]);
-
+  const removeFavoriteLocationByUsername = async (username, location) => {
+    try {
+      const db = getDatabase();
+      const userRef = ref(db, 'users');
+      const snapshot = await get(userRef);
+      
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const userId = _.findKey(users, (userData) => userData.username === username);
+        
+        if (userId) {
+          const userFavoriteLocationsRef = ref(db, `users/${userId}/favoriteLocations`);
+          const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
+          const favoriteLocations = snapshotFavoriteLocations.val();
+  
+          const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === location);
+          if (existingLocation) {
+            const existingLocationId = _.findKey(favoriteLocations, (data) => data.locationAddress === location);
+            if (existingLocationId) {
+              const locationRef = ref(db, `users/${userId}/favoriteLocations/${existingLocationId}`);
+              await set(locationRef, null);
+              setCheckFavorite(!checkFavorite);
+              setImageFavorite(require("../image/heart_one.png"));
+            return;
+            }
+          } else {
+            setCheckFavorite(!checkFavorite);
+            setImageFavorite(require("../image/heart_two.png"));
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa dữ liệu:', error);
+      throw error;
+    }
+  };
+  const addFavoriteLocationByUsername = async (username, location) => {
+    try {
+      const db = getDatabase();
+      const userRef = ref(db, 'users');
+      const snapshot = await get(userRef);
+      
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const userId = _.findKey(users, (userData) => userData.username === username);
+        
+        if (userId) {
+          const userFavoriteLocationsRef = ref(db, `users/${userId}/favoriteLocations`);
+          const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
+          const favoriteLocations = snapshotFavoriteLocations.val();
+  
+          const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === location);
+          if (!existingLocation) {
+            const newLocationRef = push(userFavoriteLocationsRef);
+            await set(newLocationRef, { locationAddress: location });
+            setCheckFavorite(!checkFavorite);
+            setImageFavorite(require("../image/heart_two.png"));
+            return;
+          } else {
+            setCheckFavorite(!checkFavorite);
+            setImageFavorite(require("../image/heart_one.png"));
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi khi thêm dữ liệu:', error);
+      throw error;
+    }
+  };
+    
+  // Trạng thái của icon yêu thích
+  useEffect(() => {
+    const checkIfLocationExists = async () => {
+      const db = getDatabase();
+      const userRef = ref(db, 'users');
+      try {
+        const snapshot = await get(userRef);
+  
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          const userId = _.findKey(users, (userData) => userData.username === userNameLogin);
+  
+          if (userId) {
+            const userRef = ref(db, `users/${userId}/favoriteLocations`);
+            const snapshot = await get(userRef);
+            const favoriteLocations = snapshot.val();
+  
+            // Check if the current location exists in the user's favorite locations
+            const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === weatherDataForecast?.location?.name);
+  
+            if (existingLocation) {
+              setImageFavorite(require("../image/heart_two.png"));
+              setCheckFavorite(false);
+            } else {
+              setImageFavorite(require("../image/heart_one.png"));
+              setCheckFavorite(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Lỗi khi đọc dữ liệu:', error);
+        throw error;
+      }
+    };
+  
+    if (userNameLogin !== 'null' && weatherDataForecast) {
+      checkIfLocationExists();
+    }
+  }, [userNameLogin, weatherDataForecast]);
+  
+  // Click yêu thích
+  const onPressFovorite = (address) => {
+    if(checkFavorite){
+      addFavoriteLocationByUsername(userNameLogin,address);
+    }else{
+      openModalYT();
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Thông báo */}
@@ -218,6 +382,39 @@ const Home_screen = (props) => {
           </View>
         </View>
       </Modal>
+      {/* Modal xóa địa điểm yêu thích */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isVisibleYT}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.containerModal}>
+          <View style={styles.viewModal}>
+            <View style={styles.headerModal}>
+              <FontAwesome5
+                name="exclamation-triangle"
+                size={30}
+                color="white"
+                style={{ marginStart: 10 }}
+              />
+              <Text style={styles.textHeaderModal}>Message</Text>
+            </View>
+            <View style={styles.bodyModal}>
+              <Text style={{ fontSize: 16 }}>Are you sure to delete this address favorite?</Text>
+            </View>
+            <View style={styles.footerModal}>
+                <TouchableOpacity onPress={closeModalYT} style={styles.btnModal}>
+                  <Text style={{textAlign:'center'}}>No</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>confirmDelete(userNameLogin,weatherDataForecast.location["name"])} style={styles.btnModal}>
+                  <Text style={{textAlign:'center'}}>Yes</Text>
+                </TouchableOpacity>
+            </View>
+           
+          </View>
+        </View>
+      </Modal>
       {/* Kiểm tra dữ liệu */}
       {weatherDataForecast !== null ? (
         <>
@@ -238,7 +435,18 @@ const Home_screen = (props) => {
               </TouchableOpacity>
             </View>
             {/* Ảnh thời tiết */}
-            <Image style={styles.weatherImage} source={srcImage} />
+            <View>
+              <Image style={styles.weatherImage} source={srcImage} />
+              <TouchableOpacity
+                onPress={()=>onPressFovorite(weatherDataForecast.location["name"])}
+                style={{ position: "absolute", top: 10, right: 10 }}
+              >
+                <Image
+                  style={{ width: 40, height: 40 }}
+                  source={imageFovirite}
+                />
+              </TouchableOpacity>
+            </View>
             {/* Nhiệt độ */}
             <View style={styles.temperatureContainer}>
               <View style={styles.temperatureDetails}>
@@ -395,7 +603,7 @@ const Home_screen = (props) => {
               />
               {renderHourlyForecast()}
             </View>
-                {/* Dự báo theo ngày */}
+            {/* Dự báo theo ngày */}
             <View
               style={{
                 width: "100%",
@@ -459,7 +667,7 @@ const Home_screen = (props) => {
                     justifyContent: "space-between",
                   }}
                 >
-                   <Image
+                  <Image
                     style={{ width: 60, height: 60 }}
                     source={require("../image/sun.png")}
                   />
