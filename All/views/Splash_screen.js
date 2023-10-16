@@ -6,7 +6,7 @@ const Splash_screen = (props) => {
   const navigation = useNavigation();
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('login'); 
+      navigation.replace('login'); 
     }, 3000);
 
     return () => clearTimeout(timer); 

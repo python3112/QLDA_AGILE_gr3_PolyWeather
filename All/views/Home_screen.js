@@ -180,6 +180,7 @@ const Home_screen = (props) => {
         openModal();
       });
   };
+  
   // Xác nhận xóa
   const confirmDelete =(userNameLogin,address)=>{
     removeFavoriteLocationByUsername(userNameLogin,address);
@@ -233,6 +234,7 @@ const Home_screen = (props) => {
       setSrcImage(imagePath);
     }
   }, [weatherDataForecast]);
+  // Xóa địa điểm yêu thích
   const removeFavoriteLocationByUsername = async (username, location) => {
     try {
       const db = getDatabase();
@@ -270,6 +272,7 @@ const Home_screen = (props) => {
       throw error;
     }
   };
+  // Thêm địa điểm yêu thích
   const addFavoriteLocationByUsername = async (username, location) => {
     try {
       const db = getDatabase();

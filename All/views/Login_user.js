@@ -69,7 +69,7 @@ const LoginScreen = (props) => {
               
               Save_Data_User(user);
               
-               navigation.navigate("home");
+               navigation.replace("home");
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
