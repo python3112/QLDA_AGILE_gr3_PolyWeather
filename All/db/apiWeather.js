@@ -12,7 +12,7 @@ const fetchWeatherForecast = async (address) => {
       days: '3'
     },
     headers: {
-      'X-RapidAPI-Key': 'a3c3768a83msh0d40f6de0ee49d4p12552fjsn4061d1039af8',
+      'X-RapidAPI-Key': '92ace59e7bmshe5979c41887fecap18d822jsna8219e1eb828',
       'X-RapidAPI-Host': 'weatherapi-com.p.rapidapi.com'
     }
   };
