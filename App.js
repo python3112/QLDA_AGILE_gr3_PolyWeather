@@ -64,9 +64,22 @@ const CustomHeader = () => {
   )
 };
 
+
+
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = (props) => (
+const CustomDrawerContent = (props) =>{
+ const {navigation} = props;
+  const handleLogout =  () => {
+    // Xóa thông tin đăng nhập từ AsyncStorage hoặc trạng thái đăng nhập trong Redux (tuỳ thuộc vào cách bạn quản lý)
+     // Ví dụ với AsyncStorage
+  
+    // Điều hướng người dùng đến màn hình đăng nhập (hoặc màn hình khác tùy theo yêu cầu)
+    
+    navigation.replace("login");
+  };
+   return (
+  
   <View style={{ height: '100%', }}>
     <CustomHeader />
     <View style={{flex:1}}>
@@ -87,9 +100,9 @@ const CustomDrawerContent = (props) => (
               borderRadius:10,
               
             }}
-            onPress={() => {
+            onPress={handleLogout}
                   
-            }}
+            
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                <AntDesign name="logout" size={23} color='black' />
@@ -99,7 +112,7 @@ const CustomDrawerContent = (props) => (
           </TouchableOpacity>
         </View>
   </View>
-);
+)};
 
 function DrawerNav() {
   return (
