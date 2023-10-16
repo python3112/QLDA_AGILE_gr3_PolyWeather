@@ -5,6 +5,7 @@ import {
   Image,
   ImageBackground,
   FlatList,
+  ActivityIndicator
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, set, push, get, child } from "firebase/database";
@@ -15,6 +16,7 @@ const Favorite_address_screen = () => {
   const _ = require("lodash");
   const [favoriteLocations, setFavoriteLocations] = useState([]);
   const [userNameLogin, setUserNameLogin] = useState("null");
+  const [data, setData] = useState("null");
  
 
   
@@ -111,6 +113,7 @@ const Favorite_address_screen = () => {
       const locationsData = await getAllFavoriteLocationsByUsername(
         userNameLogin
       );
+        setData(locationsData);
       const locationsArray = Object.keys(locationsData).map((key) => ({
         id: key,
         locationAddress: locationsData[key].locationAddress,
@@ -118,7 +121,7 @@ const Favorite_address_screen = () => {
       setFavoriteLocations(locationsArray);
     };
     fetchData();
-  }, [userNameLogin]);
+  }, [userNameLogin,data]);
 
   const [weatherIcons, setWeatherIcons] = useState({});
   const [temperatures, setTemperatures] = useState({});
@@ -178,7 +181,17 @@ const Favorite_address_screen = () => {
             </View>
           </ImageBackground>
         )}
-        ListEmptyComponent={() => <Text>No favorite locations found</Text>}
+        ListEmptyComponent={() => // Hiển thị nếu dữ liệu null
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="orange" />
+        </View>}
       />
     </View>
   );
@@ -191,6 +204,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     backgroundColor: "white",
+    width: "100%",
   },
   backgroundImage: {
     height: 200,
