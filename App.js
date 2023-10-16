@@ -41,7 +41,7 @@ const CustomHeader = () => {
         backgroundColor: 'rgba(255,165,0 , 0.5)'
 
       }}>
-      <Image style={{ width: 100, height: 100, borderRadius: 50, marginTop: '10%' }} source={require('./All/image/snowy.jpg')}>
+      <Image style={{ width: 100, height: 100, borderRadius: 50, marginTop: '10%' }} source={require('./All/image/man.png')}>
 
       </Image>
 

@@ -67,7 +67,7 @@ const SignupScreen = (props) => {
         if (!await checkLogin(username)) {
           addNewUser(fullName, username, password, adress, status)
           console.log('checkRegister:đăng kí thành công')
-          navigation.navigate('login');
+          navigation.replace('login'); 
         } else {
           setIsVisible(true);
           settextErr("Tên tài khoản đã tồn tại !");
@@ -75,7 +75,7 @@ const SignupScreen = (props) => {
         }
       } else {
         setIsVisible(true);
-        settextErr("Sai họ tên   hoặc mật khẩu không khớp");
+        settextErr("Sai họ tên hoặc mật khẩu không khớp");
         console.log('Sai định dạng số điện thoại hoặc mật khẩu không khớp');
       }
     } else {
