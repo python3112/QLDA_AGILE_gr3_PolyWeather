@@ -68,6 +68,7 @@ const LoginScreen = (props) => {
             if (user.password === password) {
               
               Save_Data_User(user);
+              
                navigation.navigate("home");
               //Mật khẩu sai => In ra thông báo
             } else {

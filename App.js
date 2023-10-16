@@ -75,7 +75,7 @@ const CustomDrawerContent = (props) =>{
      // Ví dụ với AsyncStorage
   
     // Điều hướng người dùng đến màn hình đăng nhập (hoặc màn hình khác tùy theo yêu cầu)
-    
+    AsyncStorage.clear();
     navigation.replace("login");
   };
    return (
