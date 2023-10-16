@@ -18,49 +18,42 @@ const Favorite_address_screen = () => {
  
 
   
-// Thay đổi ảnh theo tình trạng thời tiết
-const setWeatherImage = (conditionText) => {
-  let imagePath = "";
-
-  switch (conditionText.toLowerCase()) {
-    // Ít mây
-    case "partly cloudy":
-      imagePath = require("../image/partly_cloudy.jpg");
-      break;
-    case "clear":
-      imagePath = require("../image/clear.jpg");
-      break;
-    // Sương mù
-    case "mist":
-      imagePath = require("../image/mist.jpg");
-      break;
-    // Âm u overcast
-    case "overcast":
-      imagePath = require("../image/overcast.jpg");
-      break;
-    // Mưa rải rác Moderate rain
-    case "patchy rain possible":
-    case "moderate rain":
-    case "light rain":
-      imagePath = require("../image/rainy.jpg");
-      break;
-    // Mưa và sấm sét
-    case "patchy light rain with thunder":
-      imagePath = require("../image/rain_with_thunder.jpg");
-      break;
-    // Nắng
-    case "sunny":
-      imagePath = require("../image/sunny.jpg");
-      break;
-
-    default:
-      imagePath = require("../image/cloudy.jpg");
-      break;
-  }
-
-  return imagePath;
-};
- console.log(setWeatherImage('overcast'));
+  const setWeatherImage = (conditionText) => {
+    let imagePath = require("../image/cloudy.jpg"); // Set a default image path
+  
+    if (conditionText) {
+      switch (conditionText.toLowerCase()) {
+        case "partly cloudy":
+          imagePath = require("../image/partly_cloudy.jpg");
+          break;
+        case "clear":
+          imagePath = require("../image/clear.jpg");
+          break;
+        case "mist":
+          imagePath = require("../image/mist.jpg");
+          break;
+        case "overcast":
+          imagePath = require("../image/overcast.jpg");
+          break;
+        case "patchy rain possible":
+        case "moderate rain":
+        case "light rain":
+          imagePath = require("../image/rainy.jpg");
+          break;
+        case "patchy light rain with thunder":
+          imagePath = require("../image/rain_with_thunder.jpg");
+          break;
+        case "sunny":
+          imagePath = require("../image/sunny.jpg");
+          break;
+        default:
+          imagePath = require("../image/cloudy.jpg");
+          break;
+      }
+    }
+  
+    return imagePath;
+  };
   
   useEffect(() => {
     const getStoredUsername = async () => {
@@ -126,6 +119,7 @@ const setWeatherImage = (conditionText) => {
     };
     fetchData();
   }, [userNameLogin]);
+
   const [weatherIcons, setWeatherIcons] = useState({});
   const [temperatures, setTemperatures] = useState({});
   const [status, setStatus] = useState({});
@@ -215,13 +209,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    paddingHorizontal: 10,
   },
   bottomLeft: {
     position: "absolute",
     bottom: 0,
     left: 0,
-    padding: 10,
+    paddingHorizontal: 10,
   },
   bottomRight: {
     position: "absolute",
