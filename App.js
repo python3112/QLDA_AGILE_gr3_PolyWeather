@@ -187,6 +187,12 @@ export default function App() {
           component={DrawerNav}
           options={{ headerShown: false }}
         />
+        
+        <Stack.Screen
+          name="favorite"
+          component={Favorite_address_screen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
