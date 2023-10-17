@@ -29,6 +29,7 @@ const Home_screen = (props) => {
   const [searchAddress, setSearchAddress] = useState('Hanoi');
   const _ = require('lodash');
   const [userNameLogin, setUserNameLogin] = useState('null');
+  const [dataFavorite, setDataFavorite] = useState(null);
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
@@ -339,10 +340,9 @@ const Home_screen = (props) => {
             const userRef = ref(db, `users/${userId}/favoriteLocations`);
             const snapshot = await get(userRef);
             const favoriteLocations = snapshot.val();
-  
-            // Check if the current location exists in the user's favorite locations
+            setDataFavorite(favoriteLocations);
             const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === weatherDataForecast?.location?.name);
-  
+            
             if (existingLocation) {
               setImageFavorite(require("../image/heart_two.png"));
               setCheckFavorite(false);
@@ -361,7 +361,7 @@ const Home_screen = (props) => {
     if (userNameLogin !== 'null' && weatherDataForecast) {
       checkIfLocationExists();
     }
-  }, [userNameLogin, weatherDataForecast]);
+  }, [userNameLogin, weatherDataForecast,dataFavorite]);
   
   // Click yêu thích
   const onPressFovorite = (address) => {
