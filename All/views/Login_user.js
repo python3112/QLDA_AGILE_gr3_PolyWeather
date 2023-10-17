@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const LoginScreen = (props) => {
-  const {navigation} = props
+  const { navigation } = props
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -32,7 +32,7 @@ const LoginScreen = (props) => {
   };
 
   //Kết nối firebase
-  useEffect( () => {
+  useEffect(() => {
     firebase();
     // async () =>{
     //   if(save){
@@ -42,12 +42,14 @@ const LoginScreen = (props) => {
     //  }
     // }
 
-  
-   
+
+
   }, []);
 
+
+
   //Check đăng nhập
-  const checkLogin = async() => {
+  const checkLogin = async () => {
     const db = getDatabase();
     const userRef = ref(db, "users");
 
@@ -55,21 +57,25 @@ const LoginScreen = (props) => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const users = snapshot.val();
-          
-          
           // Kiểm tra tài khoản có tồn tại không
           const user = Object.values(users).find(
             (userData) => userData.username === username,
           );
           //Kiểm tra mật khẩu
           if (user) {
-           
+
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
-              
-              Save_Data_User(user);
-              
-               navigation.replace("home");
+
+              try {
+                const jsonValue = JSON.stringify(user);
+                AsyncStorage.setItem('Data_User', jsonValue)
+
+              } catch (e) {
+                console.log("lưu data lỗi :" + e)
+              }
+
+              navigation.replace("home");
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
@@ -89,21 +95,15 @@ const LoginScreen = (props) => {
       });
   };
 
-  const Save_Data_User = (user_Login) => {
+  const Save_Data_User = async (user_Login) => {
     try {
       const jsonValue = JSON.stringify(user_Login);
-      const kq = AsyncStorage.setItem('Data_User', jsonValue , () => {
-        if(kq){
-        }
-        else{
-          return;
-        }
-      });
-    
+      await AsyncStorage.setItem('Data_User', jsonValue)
+
     } catch (e) {
       console.log("lưu data lỗi :" + e)
     }
-  
+
   }
   return (
     <View style={styles.container}>
@@ -189,7 +189,7 @@ const LoginScreen = (props) => {
               <View
                 style={styles.bodyModal}
               >
-                <Text style={{ fontSize: 16}}>
+                <Text style={{ fontSize: 16 }}>
                   {textErr}
                 </Text>
               </View>
@@ -204,7 +204,7 @@ const LoginScreen = (props) => {
         </Modal>
 
         {/* Button Login => Click => Chuyển sang màn hình Home */}
-        <TouchableOpacity style={styles.btnLogin} onPress={checkLogin}>
+        <TouchableOpacity style={styles.btnLogin} onPress={() => checkLogin()}>
           <Text style={styles.textBtnLogin}>Login</Text>
         </TouchableOpacity>
 
@@ -241,7 +241,7 @@ const LoginScreen = (props) => {
           </View>
         </View>
       </View>
-      
+
       {/* Đăng ký */}
       <View style={styles.containerSignUp}>
         <Text style={styles.textSignUp}>Not register yet?</Text>
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  
+
   //Logo
   imageLogo: {
     width: 150,
@@ -387,15 +387,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-  line:{
+  line: {
     height: 0.5,
     backgroundColor: "grey",
     width: "30%",
   },
-  textLoginOther:{
+  textLoginOther: {
     fontSize: 16, color: "grey", marginHorizontal: 15
   },
-//  SignUp
+  //  SignUp
   textSignUp: {
     color: "grey",
     fontSize: 16,
@@ -406,27 +406,27 @@ const styles = StyleSheet.create({
     marginEnd: 5,
     fontWeight: "500",
   },
- 
+
   // Modal 
   messageLogin: {
     color: "red",
     alignSelf: "flex-start",
     marginTop: 10,
   },
-  containerModal:{
+  containerModal: {
     flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  viewModal:{
+  viewModal: {
     width: "80%",
     height: 163,
     backgroundColor: "white",
     borderRadius: 10,
     elevation: 10,
   },
-  headerModal:{
+  headerModal: {
     backgroundColor: "red",
     height: 50,
     flexDirection: "row",
@@ -434,13 +434,13 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  textHeaderModal:{
+  textHeaderModal: {
     color: "white",
     fontWeight: "bold",
     fontSize: 20,
     marginStart: 15,
   },
-  bodyModal:{
+  bodyModal: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     height: 70,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     justifyContent: "center",
   },
-  btnModal:{
+  btnModal: {
     borderRadius: 5,
     borderColor: "grey",
     marginTop: 5,

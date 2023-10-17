@@ -20,15 +20,29 @@ const CustomHeader = () => {
 
   useEffect(() => {
     // Lấy dữ liệu từ AsyncStorage
-    AsyncStorage.getItem("Data_User", (error, result) => {
-      if (!error) {
-        const user = JSON.parse(result);
-        setData(user);
+    // async AsyncStorage.getItem('Data_User', (error, result) => {
+    //   if (!error) {
+    //     const user = await JSON.parse(result);
+    //     setData(user);
 
-      } else {
-        console.log("Error reading data from AsyncStorage: " + error);
-      }
-    });
+    //   } else {
+    //     console.log("Error reading data from AsyncStorage: " + error);
+    //   }
+    // });
+    const getdata = async () => {
+      await AsyncStorage.getItem('Data_User', (error, result) => {
+        if (!error) {
+          const user = JSON.parse(result);
+          setData(user);
+
+        } else {
+          console.log("Error reading data from AsyncStorage: " + error);
+        }
+      });
+    }
+
+    getdata()
+
   }, []);
 
 
@@ -68,51 +82,52 @@ const CustomHeader = () => {
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = (props) =>{
- const {navigation} = props;
-  const handleLogout =  () => {
+const CustomDrawerContent = (props) => {
+  const { navigation } = props;
+  const handleLogout = () => {
     // Xóa thông tin đăng nhập từ AsyncStorage hoặc trạng thái đăng nhập trong Redux (tuỳ thuộc vào cách bạn quản lý)
-     // Ví dụ với AsyncStorage
-  
+    // Ví dụ với AsyncStorage
+
     // Điều hướng người dùng đến màn hình đăng nhập (hoặc màn hình khác tùy theo yêu cầu)
     AsyncStorage.clear();
     navigation.replace("login");
   };
-   return (
-  
-  <View style={{ height: '100%', }}>
-    <CustomHeader />
-    <View style={{flex:1}}>
-      <DrawerContentScrollView contentContainerStyle={{}} {...props}>
+  return (
 
-        <DrawerItemList {...props} />
-    
-      </DrawerContentScrollView>
+    <View style={{ height: '100%', }}>
+      <CustomHeader />
+      <View style={{ flex: 1 }}>
+        <DrawerContentScrollView contentContainerStyle={{}} {...props}>
+
+          <DrawerItemList {...props} />
+
+        </DrawerContentScrollView>
+      </View>
+      <View style={{ marginBottom: '5%' }}>
+        <TouchableOpacity
+          style={{
+            width: '90%',
+            paddingVertical: 15,
+            marginStart: '5%',
+            borderColor: 'rgb(255, 0, 0)',
+            borderWidth: 1.5,
+            borderRadius: 10,
+
+          }}
+          onPress={handleLogout}
+
+
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <AntDesign name="logout" size={23} color='black' />
+            <Text style={{ color: 'black', fontWeight: 'bold', marginStart: 10 }}>Sign Out</Text>
+          </View>
+
+        </TouchableOpacity>
+      </View>
     </View>
-    <View style={{marginBottom:'5%'}}>
-          <TouchableOpacity
-            style={{
-              width: '90%',
-              paddingVertical: 15,
-              marginStart: '5%',
-              borderColor:'rgb(255, 0, 0)',
-              borderWidth:1.5,
-              borderRadius:10,
-              
-            }}
-            onPress={handleLogout}
-                  
-            
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-               <AntDesign name="logout" size={23} color='black' />
-              <Text style={{color:'black' , fontWeight:'bold' , marginStart:10}}>Sign Out</Text>
-            </View>
-
-          </TouchableOpacity>
-        </View>
-  </View>
-)};
+  )
+};
 
 function DrawerNav() {
   return (
@@ -147,8 +162,10 @@ function DrawerNav() {
       />
       <Drawer.Screen
         name="Setting"
+        
         component={Setting}
         options={{
+          headerShown: false,
           drawerLabel: "Setting Account",
           title: "Setting Account",
           drawerIcon: ({ color }) => (
