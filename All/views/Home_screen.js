@@ -17,20 +17,22 @@ import { useNavigation } from "@react-navigation/native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
 import { FlatList } from "react-native-gesture-handler";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase, ref, set, push, get, child } from "firebase/database";
 
 import firebase from "../db/firebase";
 
 const Home_screen = (props) => {
-  const {navigation,route} = props
-  const { locationAddressYT } = route.params || {}; 
-  const [address, setAddress] = useState(!!locationAddressYT?locationAddressYT:'hanoi');
-  const [searchAddress, setSearchAddress] = useState('Hanoi');
-  const _ = require('lodash');
-  const [userNameLogin, setUserNameLogin] = useState('null');
-  const [dataFavorite, setDataFavorite] = useState(null);
+  const { navigation, route } = props;
+  const { locationAddressYT, locationNow } = route.params || {};
+  const [address, setAddress] = useState(locationNow);
+  const [locationAddressFr, setLocationAddressFr] = useState(locationAddressYT);
+  const [searchAddress, setSearchAddress] = useState(null);
+
+  const _ = require("lodash");
+  const [userNameLogin, setUserNameLogin] = useState(null);
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
+  const [dataFavorite, setDataFavorite] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
@@ -38,16 +40,7 @@ const Home_screen = (props) => {
   const [imageFovirite, setImageFavorite] = useState(
     require("../image/heart_one.png")
   );
-  useEffect(() => {
-    if (!locationAddressYT) {
-      setAddress('hanoi');
-      setSearchAddress('hanoi');
-    }else{
-      setAddress(locationAddressYT);
-      setSearchAddress(locationAddressYT);
 
-    }
-  }, [locationAddressYT]);
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -57,18 +50,19 @@ const Home_screen = (props) => {
     "Friday",
     "Saturday",
   ];
- 
+
   useEffect(() => {
+    console.log("Đang chạy getStoredUsername");
     const getStoredUsername = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('Data_User');
+        const jsonValue = await AsyncStorage.getItem("Data_User");
         if (jsonValue !== null) {
           const data = JSON.parse(jsonValue);
           if (data.username) {
             setUserNameLogin(data.username);
           }
         } else {
-          console.log('Không tìm thấy dữ liệu.');
+          console.log("Không tìm thấy dữ liệu.");
           return null;
         }
       } catch (e) {
@@ -79,7 +73,7 @@ const Home_screen = (props) => {
 
     getStoredUsername(); // Gọi hàm ở đây để nó tự chạy khi vào màn hình
   }, []);
-  
+
   // Chức năng dự báo 24h tiếp theo tính từ giờ hiện tại
   const currentTime = moment();
   const startDateTime = currentTime.clone().add(0, "hour");
@@ -154,13 +148,13 @@ const Home_screen = (props) => {
   const closeModal = () => {
     setIsVisible(false);
   };
-    // Mở đóng modal yêu thích
-    const openModalYT = () => {
-      setIsVisibleYT(true);
-    };
-    const closeModalYT = () => {
-      setIsVisibleYT(false);
-    };
+  // Mở đóng modal yêu thích
+  const openModalYT = () => {
+    setIsVisibleYT(true);
+  };
+  const closeModalYT = () => {
+    setIsVisibleYT(false);
+  };
   // Lấy ngày
   const [currentDateTime, setCurrentDateTime] = useState(
     moment().format("dddd, MMMM D, YYYY")
@@ -174,37 +168,27 @@ const Home_screen = (props) => {
   }, []);
   // Lấy dữ liệu từ api
   useEffect(() => {
-    fetchWeatherForecast(address)
-      .then((data) => {
-        setWeatherDataForecast(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching weather forecast data:", error);
-      });
-  }, [address]);
-  // Tìm kiếm
-  const searchWeather = () => {
-    setAddress(searchAddress);
-    if (address.trim() === "") {
-      return;
-    }
-    fetchWeatherForecast(address)
+    console.log("Đang chạy fetchWeatherForecast");
+
+    fetchWeatherForecast(!!locationAddressFr ? locationAddressFr : address)
       .then((data) => {
         setWeatherDataForecast(data);
       })
       .catch((error) => {
         openModal();
       });
-  };
-  
+  }, [address, locationAddressFr]);
+
   // Xác nhận xóa
-  const confirmDelete =(userNameLogin,address)=>{
-    removeFavoriteLocationByUsername(userNameLogin,address);
+  const confirmDelete = (userNameLogin, address) => {
+    removeFavoriteLocationByUsername(userNameLogin, address);
     closeModalYT();
-  }
+  };
   // Dự báo
   // Thay đổi ảnh theo tình trạng thời tiết
   useEffect(() => {
+    console.log("Đang chạy Thay đổi ảnh theo tình trạng thời tiết");
+
     if (weatherDataForecast) {
       const conditionText =
         weatherDataForecast.current["condition"]["text"].toLowerCase();
@@ -250,31 +234,94 @@ const Home_screen = (props) => {
       setSrcImage(imagePath);
     }
   }, [weatherDataForecast]);
+
+  // Trạng thái của icon yêu thích
+  useEffect(() => {
+    const checkIfLocationExists = async () => {
+      console.log("Đang chạy Trạng thái của icon yêu thích");
+
+      const db = getDatabase();
+      const userRef = ref(db, "users");
+      try {
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          const userId = _.findKey(
+            users,
+            (userData) => userData.username === userNameLogin
+          );
+
+          if (userId) {
+            const userRef = ref(db, `users/${userId}/favoriteLocations`);
+            const snapshot = await get(userRef);
+            const favoriteLocations = snapshot.val();
+            setDataFavorite(favoriteLocations);
+            const existingLocation = _.find(
+              favoriteLocations,
+              (loc) =>
+                loc.locationAddress === weatherDataForecast?.location?.name
+            );
+
+            if (existingLocation) {
+              setImageFavorite(require("../image/heart_two.png"));
+              setCheckFavorite(false);
+            } else {
+              setImageFavorite(require("../image/heart_one.png"));
+              setCheckFavorite(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi đọc dữ liệu:", error);
+        throw error;
+      }
+    };
+
+    if (userNameLogin !== null && weatherDataForecast) {
+      checkIfLocationExists();
+    }
+  }, [weatherDataForecast]);
   // Xóa địa điểm yêu thích
   const removeFavoriteLocationByUsername = async (username, location) => {
     try {
       const db = getDatabase();
-      const userRef = ref(db, 'users');
+      const userRef = ref(db, "users");
       const snapshot = await get(userRef);
-      
+
       if (snapshot.exists()) {
         const users = snapshot.val();
-        const userId = _.findKey(users, (userData) => userData.username === username);
-        
+        const userId = _.findKey(
+          users,
+          (userData) => userData.username === username
+        );
+
         if (userId) {
-          const userFavoriteLocationsRef = ref(db, `users/${userId}/favoriteLocations`);
+          const userFavoriteLocationsRef = ref(
+            db,
+            `users/${userId}/favoriteLocations`
+          );
           const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
           const favoriteLocations = snapshotFavoriteLocations.val();
-  
-          const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === location);
+
+          const existingLocation = _.find(
+            favoriteLocations,
+            (loc) => loc.locationAddress === location
+          );
           if (existingLocation) {
-            const existingLocationId = _.findKey(favoriteLocations, (data) => data.locationAddress === location);
+            const existingLocationId = _.findKey(
+              favoriteLocations,
+              (data) => data.locationAddress === location
+            );
             if (existingLocationId) {
-              const locationRef = ref(db, `users/${userId}/favoriteLocations/${existingLocationId}`);
+              const locationRef = ref(
+                db,
+                `users/${userId}/favoriteLocations/${existingLocationId}`
+              );
               await set(locationRef, null);
               setCheckFavorite(!checkFavorite);
               setImageFavorite(require("../image/heart_one.png"));
-            return;
+              return;
             }
           } else {
             setCheckFavorite(!checkFavorite);
@@ -284,7 +331,7 @@ const Home_screen = (props) => {
         }
       }
     } catch (error) {
-      console.error('Lỗi khi xóa dữ liệu:', error);
+      console.error("Lỗi khi xóa dữ liệu:", error);
       throw error;
     }
   };
@@ -292,19 +339,28 @@ const Home_screen = (props) => {
   const addFavoriteLocationByUsername = async (username, location) => {
     try {
       const db = getDatabase();
-      const userRef = ref(db, 'users');
+      const userRef = ref(db, "users");
       const snapshot = await get(userRef);
-      
+
       if (snapshot.exists()) {
         const users = snapshot.val();
-        const userId = _.findKey(users, (userData) => userData.username === username);
-        
+        const userId = _.findKey(
+          users,
+          (userData) => userData.username === username
+        );
+
         if (userId) {
-          const userFavoriteLocationsRef = ref(db, `users/${userId}/favoriteLocations`);
+          const userFavoriteLocationsRef = ref(
+            db,
+            `users/${userId}/favoriteLocations`
+          );
           const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
           const favoriteLocations = snapshotFavoriteLocations.val();
-  
-          const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === location);
+
+          const existingLocation = _.find(
+            favoriteLocations,
+            (loc) => loc.locationAddress === location
+          );
           if (!existingLocation) {
             const newLocationRef = push(userFavoriteLocationsRef);
             await set(newLocationRef, { locationAddress: location });
@@ -319,55 +375,16 @@ const Home_screen = (props) => {
         }
       }
     } catch (error) {
-      console.error('Lỗi khi thêm dữ liệu:', error);
+      console.error("Lỗi khi thêm dữ liệu:", error);
       throw error;
     }
   };
-    
-  // Trạng thái của icon yêu thích
-  useEffect(() => {
-    const checkIfLocationExists = async () => {
-      const db = getDatabase();
-      const userRef = ref(db, 'users');
-      try {
-        const snapshot = await get(userRef);
-  
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          const userId = _.findKey(users, (userData) => userData.username === userNameLogin);
-  
-          if (userId) {
-            const userRef = ref(db, `users/${userId}/favoriteLocations`);
-            const snapshot = await get(userRef);
-            const favoriteLocations = snapshot.val();
-            setDataFavorite(favoriteLocations);
-            const existingLocation = _.find(favoriteLocations, (loc) => loc.locationAddress === weatherDataForecast?.location?.name);
-            
-            if (existingLocation) {
-              setImageFavorite(require("../image/heart_two.png"));
-              setCheckFavorite(false);
-            } else {
-              setImageFavorite(require("../image/heart_one.png"));
-              setCheckFavorite(true);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Lỗi khi đọc dữ liệu:', error);
-        throw error;
-      }
-    };
-  
-    if (userNameLogin !== 'null' && weatherDataForecast) {
-      checkIfLocationExists();
-    }
-  }, [userNameLogin, weatherDataForecast,dataFavorite]);
-  
+
   // Click yêu thích
   const onPressFovorite = (address) => {
-    if(checkFavorite){
-      addFavoriteLocationByUsername(userNameLogin,address);
-    }else{
+    if (checkFavorite) {
+      addFavoriteLocationByUsername(userNameLogin, address);
+    } else {
       openModalYT();
     }
   };
@@ -419,17 +436,26 @@ const Home_screen = (props) => {
               <Text style={styles.textHeaderModal}>Message</Text>
             </View>
             <View style={styles.bodyModal}>
-              <Text style={{ fontSize: 16 }}>Are you sure to delete this address favorite?</Text>
+              <Text style={{ fontSize: 16 }}>
+                Are you sure to delete this address favorite?
+              </Text>
             </View>
             <View style={styles.footerModal}>
-                <TouchableOpacity onPress={closeModalYT} style={styles.btnModal}>
-                  <Text style={{textAlign:'center'}}>No</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>confirmDelete(userNameLogin,weatherDataForecast.location["name"])} style={styles.btnModal}>
-                  <Text style={{textAlign:'center'}}>Yes</Text>
-                </TouchableOpacity>
+              <TouchableOpacity onPress={closeModalYT} style={styles.btnModal}>
+                <Text style={{ textAlign: "center" }}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  confirmDelete(
+                    userNameLogin,
+                    weatherDataForecast.location["name"]
+                  )
+                }
+                style={styles.btnModal}
+              >
+                <Text style={{ textAlign: "center" }}>Yes</Text>
+              </TouchableOpacity>
             </View>
-           
           </View>
         </View>
       </Modal>
@@ -447,24 +473,16 @@ const Home_screen = (props) => {
               />
               <TouchableOpacity
                 style={styles.btnSearch}
-                onPress={searchWeather}
+                onPress={() => [
+                  setAddress(searchAddress),
+                  setLocationAddressFr(""),
+                ]}
               >
                 <Text style={styles.textSearch}>Search</Text>
               </TouchableOpacity>
             </View>
             {/* Ảnh thời tiết */}
-            <View>
-              <Image style={styles.weatherImage} source={srcImage} />
-              <TouchableOpacity
-                onPress={()=>onPressFovorite(weatherDataForecast.location["name"])}
-                style={{ position: "absolute", top: 10, right: 10 }}
-              >
-                <Image
-                  style={{ width: 40, height: 40 }}
-                  source={imageFovirite}
-                />
-              </TouchableOpacity>
-            </View>
+            <Image style={styles.weatherImage} source={srcImage} />
             {/* Nhiệt độ */}
             <View style={styles.temperatureContainer}>
               <View style={styles.temperatureDetails}>
@@ -502,9 +520,27 @@ const Home_screen = (props) => {
             {/* Ngày tháng năm hiện tại*/}
             <Text style={styles.dateText}>{currentDateTime}</Text>
             {/* Địa điểm */}
-            <Text style={styles.locationText}>
-              {weatherDataForecast.location["name"]}
-            </Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.locationText}>
+                {weatherDataForecast.location["name"]}
+              </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  onPressFovorite(weatherDataForecast.location["name"])
+                }
+                style={{
+                  width: 30,
+                  height: 30,
+                  marginStart: 5,
+                }}
+              >
+                <Image
+                  style={{ width: 30, height: 30, marginTop: 2 }}
+                  source={imageFovirite}
+                />
+              </TouchableOpacity>
+            </View>
+
             {/* Trạng thái thời tiết */}
             <Text style={styles.weatherStatusText}>
               {weatherDataForecast.current["condition"]["text"]}

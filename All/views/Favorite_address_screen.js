@@ -15,6 +15,7 @@ import { getDatabase, ref, set, push, get, child } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { async } from "@firebase/util";
 
 const Favorite_address_screen = (props) => {
   const { navigation } = props;
@@ -22,14 +23,13 @@ const Favorite_address_screen = (props) => {
   const _ = require("lodash");
   const [favoriteLocations, setFavoriteLocations] = useState([]);
   const [userNameLogin, setUserNameLogin] = useState("null");
-  const [data, setData] = useState("null");
   const [weatherIcons, setWeatherIcons] = useState({});
   const [temperatures, setTemperatures] = useState({});
   const [status, setStatus] = useState({});
-  const [checkFavorite, setCheckFavorite] = useState(false);
+  const [reload, setReload] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
   const [addressYT, setAddressYT] = useState("");
-
+  
  
   // Thay đổi ảnh theo thời tiết
   const setWeatherImage = (conditionText) => {
@@ -69,6 +69,7 @@ const Favorite_address_screen = (props) => {
   };
   // Lấy ra user đăng nhập
   useEffect(() => {
+    console.log('Đang lấy username đăng nhập...' );
     const getStoredUsername = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem("Data_User");
@@ -119,19 +120,25 @@ const Favorite_address_screen = (props) => {
       throw error;
     }
   };
-  // Lấy ra địa điểm yêu thích theo username và tự cập nhập nếu có dữ liệu mới
   useEffect(() => {
+    console.log('Đang chạy lấy địa điểm yêu thích theo username...' );
     const fetchData = async () => {
       const locationsData = await getAllFavoriteLocationsByUsername(
         userNameLogin
       );
-      setData(locationsData);
       const locationsArray = Object.keys(locationsData).map((key) => ({
         id: key,
         locationAddress: locationsData[key].locationAddress,
       }));
       setFavoriteLocations(locationsArray);
     };
+    fetchData();
+  }, [userNameLogin,reload]);
+  
+
+  
+  useEffect(() => {
+    console.log('Đang lấy thời tiết theo địa điểm...' );
     const fetchWeatherData = async () => {
       const weatherData = {};
       const temperatureData = {};
@@ -149,10 +156,10 @@ const Favorite_address_screen = (props) => {
       setTemperatures(temperatureData);
       setStatus(statusData);
     };
-    fetchWeatherData();
-    fetchData();
-  }, [userNameLogin, data]);
-
+    if (favoriteLocations.length > 0) {
+      fetchWeatherData();
+    }
+  }, [favoriteLocations]);
   // Xóa địa điểm yêu thích
   const removeFavoriteLocationByUsername = async (username) => {
     try {
@@ -190,12 +197,11 @@ const Favorite_address_screen = (props) => {
                 `users/${userId}/favoriteLocations/${existingLocationId}`
               );
               await set(locationRef, null);
-              setCheckFavorite(!checkFavorite);
               closeModalYT();
+              setReload(!reload);
               return;
             }
           } else {
-            setCheckFavorite(!checkFavorite);
             return;
           }
         }
@@ -322,6 +328,18 @@ const Favorite_address_screen = (props) => {
             </ImageBackground>
           );
         }}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color="orange" />
+          </View>
+        )}
       />
     </View>
   );

@@ -16,7 +16,10 @@ import firebase from "../db/firebase";
 import { getDatabase, ref, get } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import * as Location from 'expo-location';
+import axios from 'axios';
 
+const GEOCODING_API_KEY = 'AIzaSyD-pYfVBDIJcDZwHdAQksogXm78sP7Kb3Y';
 const LoginScreen = (props) => {
 const{navigation } = props;
   const [username, setUsername] = useState("");
@@ -25,6 +28,25 @@ const{navigation } = props;
   const [textErr, settextErr] = useState("");
   const [UserLogin, setUserLogin] = useState(null);
   const [save, setsave] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [addressNow, setAddressNow] = useState(null);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setAddressNow(`${location.coords.latitude},${location.coords.longitude}`);
+    })();
+  }, [addressNow]);
+
+  
+
+ 
+  
+
   // Modal
   const [isVisible, setIsVisible] = useState(false);
   const closeModal = () => {
@@ -50,6 +72,7 @@ const{navigation } = props;
 
   //Check đăng nhập
   const checkLogin = async () => {
+    setAddressNow('Hải Phòng');
     const db = getDatabase();
     const userRef = ref(db, "users");
 
@@ -64,6 +87,7 @@ const{navigation } = props;
           //Kiểm tra mật khẩu
           if (user) {
 
+
             //Mật khẩu đúng => Chuyển sang màn hình Home
             if (user.password === password) {
 
@@ -74,8 +98,7 @@ const{navigation } = props;
               } catch (e) {
                 console.log("lưu data lỗi :" + e)
               }
-
-              navigation.replace("home");
+              navigation.replace("home",{locationNow: addressNow});
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
@@ -112,7 +135,6 @@ const{navigation } = props;
         <Image style={styles.imageLogo} source={require("../image/logo.png")} />
         <Text style={styles.textLogo}>POLY WEATHER</Text>
       </View>
-
       <View style={styles.body}>
         {/* Phần nhập dữ liệu */}
         <View style={styles.containerInput}>

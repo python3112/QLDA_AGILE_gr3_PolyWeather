@@ -162,7 +162,6 @@ function DrawerNav() {
       />
       <Drawer.Screen
         name="Setting"
-        
         component={Setting}
         options={{
           headerShown: false,
@@ -204,7 +203,6 @@ export default function App() {
           component={DrawerNav}
           options={{ headerShown: false }}
         />
-        
         <Stack.Screen
           name="favorite"
           component={Favorite_address_screen}
