@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useFocusEffect  } from "@react-navigation/native";
 import { getDatabase, ref, set, push, get, child } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchWeatherForecast } from "../db/apiWeather";
@@ -29,7 +29,17 @@ const Favorite_address_screen = (props) => {
   const [reload, setReload] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
   const [addressYT, setAddressYT] = useState("");
-  
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Màn hình được focus, đang cập nhật dữ liệu...");
+      // Các hoạt động cập nhật dữ liệu ở đây
+      getStoredUsername();
+      fetchData();
+      return () => {
+        // Xử lý trước khi màn hình không còn focus (nếu cần thiết)
+      };
+    }, [])
+  );
  
   // Thay đổi ảnh theo thời tiết
   const setWeatherImage = (conditionText) => {
@@ -68,25 +78,26 @@ const Favorite_address_screen = (props) => {
     return imagePath;
   };
   // Lấy ra user đăng nhập
-  useEffect(() => {
-    console.log('Đang lấy username đăng nhập...' );
-    const getStoredUsername = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("Data_User");
-        if (jsonValue !== null) {
-          const data = JSON.parse(jsonValue);
-          if (data.username) {
-            setUserNameLogin(data.username);
-          }
-        } else {
-          console.log("Không tìm thấy dữ liệu.");
-          return null;
+  const getStoredUsername = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("Data_User");
+      if (jsonValue !== null) {
+        const data = JSON.parse(jsonValue);
+        if (data.username) {
+          setUserNameLogin(data.username);
         }
-      } catch (e) {
-        console.log("Lỗi khi đọc dữ liệu: ", e);
+      } else {
+        console.log("Không tìm thấy dữ liệu.");
         return null;
       }
-    };
+    } catch (e) {
+      console.log("Lỗi khi đọc dữ liệu: ", e);
+      return null;
+    }
+  };
+  useEffect(() => {
+    console.log('Đang lấy username đăng nhập...' );
+    
 
     getStoredUsername();
   }, []);
@@ -97,6 +108,7 @@ const Favorite_address_screen = (props) => {
       const userRef = ref(db, "users");
       const snapshot = await get(userRef);
 
+      
       if (snapshot.exists()) {
         const users = snapshot.val();
         const userId = _.findKey(
@@ -120,18 +132,18 @@ const Favorite_address_screen = (props) => {
       throw error;
     }
   };
+  const fetchData = async () => {
+    const locationsData = await getAllFavoriteLocationsByUsername(
+      userNameLogin
+    );
+    const locationsArray = Object.keys(locationsData).map((key) => ({
+      id: key,
+      locationAddress: locationsData[key].locationAddress,
+    }));
+    setFavoriteLocations(locationsArray);
+  };
   useEffect(() => {
     console.log('Đang chạy lấy địa điểm yêu thích theo username...' );
-    const fetchData = async () => {
-      const locationsData = await getAllFavoriteLocationsByUsername(
-        userNameLogin
-      );
-      const locationsArray = Object.keys(locationsData).map((key) => ({
-        id: key,
-        locationAddress: locationsData[key].locationAddress,
-      }));
-      setFavoriteLocations(locationsArray);
-    };
     fetchData();
   }, [userNameLogin,reload]);
   
