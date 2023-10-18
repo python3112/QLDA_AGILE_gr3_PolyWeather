@@ -50,6 +50,7 @@ export const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginVertical: 5,
+    maxWidth:'85%'
   },
   weatherStatusText: {
     color: "black",
