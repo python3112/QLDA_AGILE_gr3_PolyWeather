@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, ActivityIndicator, SafeAreaView, Modal } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, ActivityIndicator, SafeAreaView, Modal, TextInput } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import firebase from '../db/firebase';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -15,7 +15,12 @@ const Setting = (props) => {
   const [dataUserSetting, setdataUserSetting] = useState(null);
   const [darkMode, setdarkMode] = useState(false);
   const [ModalVip, setModalVip] = useState(false);
+  const [ModalPass, setModalPass] = useState(false);
   const [resetData, setresetData] = useState(true);
+  const [showPass, setShowPass] = useState(false);
+  const [showPass2, setShowPass2] = useState(false);
+  const [newPass, setnewPass] = useState('');
+
 
   const fetchUserData = async () => {
     try {
@@ -64,8 +69,8 @@ const Setting = (props) => {
 
         console.log("Data updated");
         setresetData(true);
-
-        setModalVip(false)
+        setModalPass(false);
+        setModalVip(false);
       }).catch((e) => {
         console.log(e);
       })
@@ -78,26 +83,29 @@ const Setting = (props) => {
     const newData = {
       userStatus: true,
     }
-    updateData(idUser, newData);
+    updateData(idUser, newData)
+      setModalVip(false);
+    
   }
 
-  const updatePass = () => {
+  const updatePass = (pass) => {
     console.log('updatevip')
     const idUser = Object.keys(dataUserSetting)[0];
-    console.log('iduser ' + JSON.stringify(Object.keys(dataUserSetting)[0]))
     const newData = {
-      userStatus: true,
+      password:pass,
     }
-    updateData(idUser, newData);
+   updateData(idUser, newData)
+    closeModalPass()
   }
 
   const closeModalVip = () => {
     setModalVip(false);
   }
 
-  const openModalVip = () => {
-    setModalVip(true);
+  const closeModalPass = () => {
+    setModalPass(false);
   }
+ 
 
   return (
     <SafeAreaView>
@@ -221,7 +229,7 @@ const Setting = (props) => {
                   </TouchableOpacity>
                 </View>
                 {/* ////////////////////// đổi mk Account ////////////// */}
-                <View style={{
+                <TouchableOpacity style={{
                   width: '100%',
                   marginTop: 10,
                   height: 50,
@@ -230,20 +238,19 @@ const Setting = (props) => {
                   justifyContent: 'space-between',
                   backgroundColor: darkMode ? 'rgb(192,192,192)' : 'rgba(192,192,192 , 0.5)',
                   borderRadius: 5
-                }}>
+                }}
+                  onPress={() => { setModalPass(true) }}
+                >
                   <Text style={{ color: darkMode ? 'rgb(255,127,80)' : 'black', fontSize: 20, marginStart: 10, }}>
                     PassWord
                   </Text>
-                  <TouchableOpacity style={{
+
+                  <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
 
 
-                  }}>
-                    <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
+                </TouchableOpacity>
 
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{
+                <TouchableOpacity style={{
                   width: '100%',
                   marginTop: 10,
                   height: 50,
@@ -256,35 +263,28 @@ const Setting = (props) => {
                   <Text style={{ color: darkMode ? 'rgb(255,127,80)' : 'black', fontSize: 20, marginStart: 10, }}>
                     Full name
                   </Text>
-                  <TouchableOpacity style={{
+
+                  <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
 
 
-                  }}>
-                    <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
-
-                  </TouchableOpacity>
-                </View>
-                <View style={{
+                </TouchableOpacity>
+                <TouchableOpacity style={{
                   width: '100%',
                   marginTop: 10,
                   height: 50,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  backgroundColor: darkMode ? 'rgb(192,192,192)' : 'rgba(192,192,192 , 0.2)',
+                  backgroundColor: darkMode ? 'rgb(192,192,192)' : 'rgba(192,192,192 , 0.5)',
                   borderRadius: 5
                 }}>
                   <Text style={{ color: darkMode ? 'rgb(255,127,80)' : 'black', fontSize: 20, marginStart: 10, }}>
                     Adress
                   </Text>
-                  <TouchableOpacity style={{
 
+                  <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
 
-                  }}>
-                    <Entypo name='chevron-right' size={28} color={darkMode ? 'black' : '#F0810F'} />
-
-                  </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
 
 
 
@@ -292,7 +292,7 @@ const Setting = (props) => {
               </View>
 
             </View>
-
+            {/* /////////////////// modal vip /////////////// */}
             <Modal
               animationType="slide"
               transparent={true}
@@ -318,15 +318,17 @@ const Setting = (props) => {
                       Nâng cấp tài khoản Vip
                     </Text>
                   </View>
+
+                  {/* //////////////////body.////////// */}
                   <View
                     style={styles.bodyModal}
                   >
-                    <Text style={{ fontSize: 20, textAlign:'center' }}>
+                    <Text style={{ fontSize: 20, textAlign: 'center' }}>
                       Nâng cấp vip 199.000VNĐ
                     </Text>
                   </View>
 
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-around' , alignItems:'center' , marginTop:5 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 5 }}>
                     <TouchableOpacity
                       onPress={() => { closeModalVip() }}
                       style={styles.btnModal}
@@ -345,6 +347,159 @@ const Setting = (props) => {
                 </View>
               </View>
             </Modal>
+
+
+            {/* ////////////////modal pass////////////////// */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={ModalPass}
+              onRequestClose={closeModalPass}
+            >
+              <View
+                style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  , backgroundColor: "rgba(0, 0, 0, 0.5)"}}
+              >
+                <View style={{ width: '90%'  , backgroundColor:'white'  , borderRadius:10 , paddingBottom:10 }}>
+                  <View
+                    style={styles.headerModal}
+                  >
+                    <FontAwesome5
+                      name="unlock-alt"
+                      size={30}
+                      color="white"
+                      style={{ marginStart: 10 }}
+                    />
+                    <Text
+                      style={styles.textHeaderModal}
+                    >
+                      Thay đổi mật khẩu tài khoản
+                    </Text>
+                  </View>
+                   {/* //////////////////body.////////// */}
+                  <View
+                    style={{width:'100%', backgroundColor:'white' , alignItems:'center' }}
+                  >
+                    <View style={styles.viewInPut}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <FontAwesome5
+                          name="lock"
+                          size={20}
+                          color="orange"
+                          style={{ marginEnd: 10 }}
+                        />
+                        <TextInput
+                          editable={false}
+                          style={styles.tipPassword}
+                          placeholder="Repassword"
+                          secureTextEntry={showPass2 ? false : true}
+                          value={dataUserSetting[Object.keys(dataUserSetting)]['password']}
+                        />
+                      </View>
+
+
+
+                      <TouchableOpacity
+                        onPress={() => setShowPass2(!showPass2)}
+                        style={{
+                          justifyContent: "center",
+                          width: "10%",
+                          height: "100%"
+                        }}
+                      >
+                        <Entypo
+                          name={showPass2 ? "eye" : "eye-with-line"}
+                          size={20}
+                          color="orange"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.viewInPut}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <FontAwesome5
+                          name="lock"
+                          size={20}
+                          color="orange"
+                          style={{ marginEnd: 10 }}
+                        />
+                        <TextInput
+                          onChangeText={(text) =>setnewPass(text)}
+                          style={styles.tipPassword}
+                          placeholder=" newpassword"
+                          secureTextEntry={showPass ? false : true}
+                        
+                        />
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => setShowPass(!showPass)}
+                        style={{
+                          justifyContent: "center",
+                          width: "10%",
+                          height: "100%"
+                        }}
+                      >
+                        <Entypo
+                          name={showPass ? "eye" : "eye-with-line"}
+                          size={20}
+                          color="orange"
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.viewInPut}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <FontAwesome5
+                          name="lock"
+                          size={20}
+                          color="orange"
+                          style={{ marginEnd: 10 }}
+                        />
+                        <TextInput
+                          style={styles.tipPassword}
+                          placeholder="Repassword"
+                          secureTextEntry={showPass ? false : true}
+                          
+                        />
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => setShowPass(!showPass)}
+                        style={{
+                          justifyContent: "center",
+                          width: "10%",
+                          height: "100%"
+                        }}
+                      >
+                        <Entypo
+                          name={showPass ? "eye" : "eye-with-line"}
+                          size={20}
+                          color="orange"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 5  }}>
+                    <TouchableOpacity
+                      onPress={() => { closeModalPass() }}
+                      style={styles.btnModal}
+                    >
+                      <Text style={{ textAlign: "center" }}>Close</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={()=>{updatePass(newPass)}}
+                      style={styles.btnModal}
+                    >
+                      <Text style={{ textAlign: "center" }}>Change</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                </View>
+              </View>
+            </Modal>
+
+
+
+
           </>
 
         ) : (
@@ -392,6 +547,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    
   },
   viewModal: {
     width: "80%",
@@ -399,6 +555,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     elevation: 10,
+    paddingBottom:10,
   },
   headerModal: {
     backgroundColor: '#FFA500',
@@ -429,7 +586,27 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     marginEnd: 10,
     borderWidth: 1,
-    width: 60,
-    padding: 5,
-  }
+    width: 80,
+    padding:8
+  },
+
+  viewInPut: {
+    flexDirection: "row",
+    width: "95%",
+    justifyContent:'space-between',
+    height: 60,
+    alignItems: "center",
+    paddingStart: 10,
+    marginTop: 15,
+    borderRadius: 10,
+    borderColor: "orange",
+    borderWidth: 1.5,
+    marginBottom:10
+  },
+  tipPassword:{
+    maxWidth:'80%',
+    color:'black',
+    fontSize:17,
+    marginStart:10
+  },
 })
