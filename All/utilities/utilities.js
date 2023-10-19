@@ -1,6 +1,45 @@
 import moment from "moment";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDatabase, ref, get } from "firebase/database";
 
+export const checkLogin = async (username, password, setIsVisible, settextErr, navigation) => {
+  try {
+    const db = getDatabase();
+    const userRef = ref(db, "users");
+
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      const users = snapshot.val();
+      // Kiểm tra tài khoản có tồn tại không
+      const user = Object.values(users).find(
+        (userData) => userData.username === username,
+      );
+      //Kiểm tra mật khẩu
+      if (user) {
+        //Mật khẩu đúng => Chuyển sang màn hình Home
+        if (user.password === password) {
+          try {
+            const jsonValue = JSON.stringify(user);
+            await AsyncStorage.setItem('Data_User', jsonValue);
+          } catch (e) {
+            console.log("lưu data lỗi :" + e);
+          }
+          navigation.replace('home', { userNameLogin: username });
+        } else {
+          setIsVisible(true);
+          settextErr('Wrong password !');
+        }
+      } else {
+        setIsVisible(true);
+        settextErr('Account does not exist !');
+      }
+    } else {
+      console.log("No data available");
+    }
+  } catch (error) {
+    console.error("Error reading data: ", error);
+  }
+};
 export const getStoredUsername = async (setUserNameLogin) => {
   try {
     const jsonValue = await AsyncStorage.getItem("Data_User");

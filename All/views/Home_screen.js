@@ -27,16 +27,15 @@ import {
 } from "../utilities/utilities";
 import { FlatList } from "react-native-gesture-handler";
 import * as Location from "expo-location";
-
 const Home_screen = ({ route }) => {
   const { userNameLogin, locationAddressFr } = route.params;
+  const [locationNow, setLocationNow] = useState(null);
   const [searchAddress, setSearchAddress] = useState(null);
   const _ = require("lodash");
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
-  const [locationNow, setLocationNow] = useState(null);
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
   const [currentDateTime, setCurrentDateTime] = useState(
     moment().format("dddd, MMMM D, YYYY")
@@ -65,7 +64,6 @@ const Home_screen = ({ route }) => {
       );
     }, [])
   );
-  // Lấy địa điểm hiện tại
   useEffect(() => {
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -73,18 +71,20 @@ const Home_screen = ({ route }) => {
         return;
       }
       let location = null;
-      try {
-        location = await Location.getCurrentPositionAsync({});
-        if (location) {
-          setLocationNow(
-            `${location.coords.latitude},${location.coords.longitude}`
-          );
+      let isLocationLoaded = false;
+      while (!isLocationLoaded) {
+        try {
+          location = await Location.getCurrentPositionAsync({});
+          if (location) {
+            console.log("Đang tải vị trí");
+            setLocationNow(
+              `${location.coords.latitude},${location.coords.longitude}`
+            );
+            isLocationLoaded = true;
+          }
+        } catch (error) {
+          console.log("Error getting location: ", error);
         }
-      } catch (error) {
-        console.log("Error getting location: ", error);
-      }
-      if (!location) {
-        setTimeout(getLocation, 100);
       }
     };
     getLocation();
@@ -150,14 +150,14 @@ const Home_screen = ({ route }) => {
   };
   // Tải dữ liệu thời tiết từ API theo vị trí hiện tại
   const loadData = async () => {
-    console.log("loadData");
-    fetchWeatherForecast(locationNow)
-      .then((data) => {
-        setWeatherDataForecast(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      console.log("loadData");
+      fetchWeatherForecast(locationNow)
+        .then((data) => {
+          setWeatherDataForecast(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
   };
   // Tải dữ liệu thời tiết từ API theo vị trí yêu thích
   const loadDataYT = async () => {

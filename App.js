@@ -1,6 +1,5 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StatusBar } from "expo-status-bar";
 import {
   SafeAreaView,
   StyleSheet,
@@ -30,16 +29,6 @@ const CustomHeader = () => {
   const [Data, setData] = useState({});
 
   useEffect(() => {
-    // Lấy dữ liệu từ AsyncStorage
-    // async AsyncStorage.getItem('Data_User', (error, result) => {
-    //   if (!error) {
-    //     const user = await JSON.parse(result);
-    //     setData(user);
-
-    //   } else {
-    //     console.log("Error reading data from AsyncStorage: " + error);
-    //   }
-    // });
     const getdata = async () => {
       await AsyncStorage.getItem("Data_User", (error, result) => {
         if (!error) {
@@ -163,7 +152,9 @@ const DrawerNav = (props) => {
       <Drawer.Screen
         name="homeA"
         component={Home_screen}
-        initialParams={{ userNameLogin: userNameLogin}}
+        initialParams={{
+          userNameLogin: userNameLogin,
+        }}
         options={{
           drawerLabel: "Home",
           title: "Home",
