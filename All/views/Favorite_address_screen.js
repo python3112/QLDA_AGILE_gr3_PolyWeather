@@ -10,12 +10,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigation,useFocusEffect  } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { getDatabase, ref, set, push, get, child } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { async } from "@firebase/util";
+
 
 const Favorite_address_screen = (props) => {
   const { navigation } = props;
@@ -26,21 +26,29 @@ const Favorite_address_screen = (props) => {
   const [weatherIcons, setWeatherIcons] = useState({});
   const [temperatures, setTemperatures] = useState({});
   const [status, setStatus] = useState({});
-  const [reload, setReload] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
   const [addressYT, setAddressYT] = useState("");
+  const [refresh, setRefresh] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
-      console.log("Màn hình được focus, đang cập nhật dữ liệu...");
-      // Các hoạt động cập nhật dữ liệu ở đây
+      console.log("Màn hình yêu thích, đang cập nhật dữ liệu...");
       getStoredUsername();
       fetchData();
-      return () => {
-        // Xử lý trước khi màn hình không còn focus (nếu cần thiết)
-      };
+      setRefresh(!refresh);
     }, [])
   );
- 
+  useEffect(() => {
+    getStoredUsername();
+  }, [refresh]);
+  useEffect(() => {
+    fetchData();
+  }, [userNameLogin]);
+  useEffect(() => {
+    if (favoriteLocations.length > 0) {
+      fetchWeatherData();
+    }
+  }, [favoriteLocations]);
   // Thay đổi ảnh theo thời tiết
   const setWeatherImage = (conditionText) => {
     let imagePath = require("../image/cloudy.jpg");
@@ -77,30 +85,30 @@ const Favorite_address_screen = (props) => {
 
     return imagePath;
   };
-  // Lấy ra user đăng nhập
   const getStoredUsername = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("Data_User");
-      if (jsonValue !== null) {
-        const data = JSON.parse(jsonValue);
-        if (data.username) {
-          setUserNameLogin(data.username);
+    let usernameData = null;
+    while (!usernameData) {
+      console.log("Đang lấy username đăng nhập...");
+      try {
+        const jsonValue = await AsyncStorage.getItem("Data_User");
+        if (jsonValue !== null) {
+          const data = JSON.parse(jsonValue);
+          if (data.username) {
+            usernameData = data.username;
+          }
+        } else {
+          console.log("Không tìm thấy dữ liệu.");
         }
-      } else {
-        console.log("Không tìm thấy dữ liệu.");
-        return null;
+      } catch (e) {
+        console.log("Lỗi khi đọc dữ liệu: ", e);
       }
-    } catch (e) {
-      console.log("Lỗi khi đọc dữ liệu: ", e);
-      return null;
+      if (!usernameData) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
     }
+    setUserNameLogin(usernameData);
   };
-  useEffect(() => {
-    console.log('Đang lấy username đăng nhập...' );
-    
 
-    getStoredUsername();
-  }, []);
   // Lấy ra địa điểm yêu thích theo username
   const getAllFavoriteLocationsByUsername = async (userNameLogin) => {
     try {
@@ -108,7 +116,6 @@ const Favorite_address_screen = (props) => {
       const userRef = ref(db, "users");
       const snapshot = await get(userRef);
 
-      
       if (snapshot.exists()) {
         const users = snapshot.val();
         const userId = _.findKey(
@@ -121,7 +128,7 @@ const Favorite_address_screen = (props) => {
             `users/${userId}/favoriteLocations`
           );
           const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
-          const favoriteLocations = snapshotFavoriteLocations.val();
+          const favoriteLocations = await snapshotFavoriteLocations.val();
           return favoriteLocations;
         } else {
           return [];
@@ -133,45 +140,43 @@ const Favorite_address_screen = (props) => {
     }
   };
   const fetchData = async () => {
-    const locationsData = await getAllFavoriteLocationsByUsername(
-      userNameLogin
-    );
-    const locationsArray = Object.keys(locationsData).map((key) => ({
-      id: key,
-      locationAddress: locationsData[key].locationAddress,
-    }));
-    setFavoriteLocations(locationsArray);
-  };
-  useEffect(() => {
-    console.log('Đang chạy lấy địa điểm yêu thích theo username...' );
-    fetchData();
-  }, [userNameLogin,reload]);
-  
+    console.log("Đang chạy lấy địa điểm yêu thích theo username...");
+    let locationsData = await getAllFavoriteLocationsByUsername(userNameLogin);
 
-  
-  useEffect(() => {
-    console.log('Đang lấy thời tiết theo địa điểm...' );
-    const fetchWeatherData = async () => {
-      const weatherData = {};
-      const temperatureData = {};
-      const statusData = {};
-      for (const location of favoriteLocations) {
-        const data = await fetchWeatherForecast(location.locationAddress);
-        weatherData[location.id] =
-          data.forecast.forecastday["0"]["day"]["condition"]["icon"];
-        statusData[location.id] =
-          data.forecast.forecastday["0"]["day"]["condition"]["text"];
-        temperatureData[location.id] =
-          data.forecast.forecastday["0"]["day"]["avgtemp_c"];
-      }
-      setWeatherIcons(weatherData);
-      setTemperatures(temperatureData);
-      setStatus(statusData);
-    };
-    if (favoriteLocations.length > 0) {
-      fetchWeatherData();
+    while (Array.isArray(locationsData) && !locationsData.length) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      locationsData = await getAllFavoriteLocationsByUsername(userNameLogin);
     }
-  }, [favoriteLocations]);
+
+    if (locationsData) {
+      const locationsArray = Object.keys(locationsData).map((key) => ({
+        id: key,
+        locationAddress: locationsData[key].locationAddress,
+      }));
+      setFavoriteLocations(locationsArray);
+    } else {
+      console.log("locationsData is null");
+    }
+  };
+
+  const fetchWeatherData = async () => {
+    const weatherData = {};
+    const temperatureData = {};
+    const statusData = {};
+    for (const location of favoriteLocations) {
+      const data = await fetchWeatherForecast(location.locationAddress);
+      weatherData[location.id] =
+        data.forecast.forecastday["0"]["day"]["condition"]["icon"];
+      statusData[location.id] =
+        data.forecast.forecastday["0"]["day"]["condition"]["text"];
+      temperatureData[location.id] =
+        data.forecast.forecastday["0"]["day"]["avgtemp_c"];
+    }
+    setWeatherIcons(weatherData);
+    setTemperatures(temperatureData);
+    setStatus(statusData);
+  };
+
   // Xóa địa điểm yêu thích
   const removeFavoriteLocationByUsername = async (username) => {
     try {
@@ -194,27 +199,26 @@ const Favorite_address_screen = (props) => {
           const snapshotFavoriteLocations = await get(userFavoriteLocationsRef);
           const favoriteLocations = snapshotFavoriteLocations.val();
 
-          const existingLocation = _.find(
-            favoriteLocations,
-            (loc) => loc.locationAddress === addressYT
+          const existingLocationId = Object.keys(favoriteLocations).find(
+            (key) => favoriteLocations[key].locationAddress === addressYT
           );
-          if (existingLocation) {
-            const existingLocationId = _.findKey(
-              favoriteLocations,
-              (data) => data.locationAddress === addressYT
+
+          if (existingLocationId) {
+            const locationRef = ref(
+              db,
+              `users/${userId}/favoriteLocations/${existingLocationId}`
             );
-            if (existingLocationId) {
-              const locationRef = ref(
-                db,
-                `users/${userId}/favoriteLocations/${existingLocationId}`
-              );
-              await set(locationRef, null);
-              closeModalYT();
-              setReload(!reload);
-              return;
-            }
-          } else {
-            return;
+            await set(locationRef, null);
+
+            // Xóa phần tử đã bị xóa khỏi mảng favoriteLocations
+            const updatedFavoriteLocations = Object.keys(favoriteLocations)
+              .filter((key) => key !== existingLocationId)
+              .map((key) => ({
+                id: key,
+                locationAddress: favoriteLocations[key].locationAddress,
+              }));
+            setFavoriteLocations(updatedFavoriteLocations);
+            closeModalYT();
           }
         }
       }
@@ -223,21 +227,123 @@ const Favorite_address_screen = (props) => {
       throw error;
     }
   };
-    // Mở đóng modal yêu thích
-    const openModalYT = (address) => {
-      setAddressYT(address);
-      setIsVisibleYT(true);
-    };
-    const closeModalYT = () => {
-      setIsVisibleYT(false);
-    };
-   // Xác nhận xóa
-   const confirmDelete = () => {
+  // Mở đóng modal yêu thích
+  const openModalYT = (address) => {
+    setAddressYT(address);
+    setIsVisibleYT(true);
+  };
+  const closeModalYT = () => {
+    setIsVisibleYT(false);
+  };
+  // Xác nhận xóa
+  const confirmDelete = () => {
     console.log("confirmDelete");
     removeFavoriteLocationByUsername(userNameLogin);
   };
   return (
     <View style={styles.container}>
+      {favoriteLocations.length ? (
+        <>
+          <FlatList
+            data={favoriteLocations}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => {
+              if (
+                !status ||
+                !temperatures ||
+                !weatherIcons ||
+                !status[item.id] ||
+                !temperatures[item.id] ||
+                !weatherIcons[item.id]
+              ) {
+                return (
+                  <View
+                    style={{
+                      flex: 1,
+                      width: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ActivityIndicator size="large" color="orange" />
+                  </View>
+                );
+              }
+
+              return (
+                <ImageBackground
+                  key={index}
+                  style={styles.backgroundImage}
+                  source={setWeatherImage(status[item.id])}
+                >
+                  <TouchableOpacity
+                    style={styles.topLeft}
+                    onPress={() =>
+                      navigation.navigate("homeA", {
+                        locationAddressYT: item.locationAddress,
+                      })
+                    }
+                  >
+                    <Text style={styles.textTopLeft}>
+                      {item.locationAddress}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.topRight}>
+                    <Image
+                      style={{ width: 60, height: 60 }}
+                      source={{
+                        uri: weatherIcons[item.id]
+                          ? "http:" + weatherIcons[item.id]
+                          : null,
+                      }}
+                    />
+                  </View>
+                  <View style={styles.bottomLeft}>
+                    <Text style={styles.textBottomLeft}>
+                      {temperatures[item.id]}°C
+                    </Text>
+                  </View>
+                  <View style={styles.bottomRight}>
+                    <TouchableOpacity
+                      style={styles.smallImage}
+                      onPress={() => openModalYT(item.locationAddress)}
+                    >
+                      <Image
+                        style={styles.smallImage}
+                        source={require("../image/delete.png")}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </ImageBackground>
+              );
+            }}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  flex: 1,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color="orange" />
+              </View>
+            )}
+          />
+        </>
+      ) : (
+        <View style={styles.centeredView}>
+          <Image
+            source={require("../image/smile.png")} // Thay đổi đường dẫn đến hình ảnh của bạn
+            style={styles.imageStyle}
+          />
+          <Text style={styles.noFavoriteText}>
+            You don't have any favorite places yet
+          </Text>
+        </View>
+      )}
+
       {/* Modal xóa địa điểm yêu thích */}
       <Modal
         animationType="slide"
@@ -272,87 +378,6 @@ const Favorite_address_screen = (props) => {
           </View>
         </View>
       </Modal>
-      <FlatList
-        data={favoriteLocations}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => {
-          if (
-            !status ||
-            !temperatures ||
-            !weatherIcons ||
-            !status[item.id] ||
-            !temperatures[item.id] ||
-            !weatherIcons[item.id]
-          ) {
-            return (
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ActivityIndicator size="large" color="orange" />
-              </View>
-            );
-          }
-
-          return (
-            <ImageBackground
-              key={index}
-              style={styles.backgroundImage}
-              source={setWeatherImage(status[item.id])}
-            >
-              <TouchableOpacity
-                style={styles.topLeft}
-                onPress={() => navigation.navigate("homeA", { locationAddressYT: item.locationAddress })}
-              >
-                <Text style={styles.textTopLeft}>{item.locationAddress}</Text>
-              </TouchableOpacity>
-
-              <View style={styles.topRight}>
-                <Image
-                  style={{ width: 60, height: 60 }}
-                  source={{
-                    uri: weatherIcons[item.id]
-                      ? "http:" + weatherIcons[item.id]
-                      : null,
-                  }}
-                />
-              </View>
-              <View style={styles.bottomLeft}>
-                <Text style={styles.textBottomLeft}>
-                  {temperatures[item.id]}°C
-                </Text>
-              </View>
-              <View style={styles.bottomRight}>
-                <TouchableOpacity
-                  style={styles.smallImage}
-                  onPress={() => openModalYT(item.locationAddress)}
-                >
-                  <Image
-                    style={styles.smallImage}
-                    source={require("../image/delete.png")}
-                  />
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
-          );
-        }}
-        ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color="orange" />
-          </View>
-        )}
-      />
     </View>
   );
 };
@@ -465,5 +490,21 @@ const styles = StyleSheet.create({
     width: 60,
     paddingHorizontal: 5,
     paddingVertical: 8,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noFavoriteText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 10,
+  },
+  imageStyle: {
+    width: 60,
+    height: 60,
+    marginBottom: 5,
   },
 });

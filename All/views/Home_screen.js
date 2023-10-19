@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   Text,
   View,
@@ -12,7 +13,6 @@ import {
 import "react-native-gesture-handler";
 import moment from "moment";
 import { fetchWeatherForecast } from "../db/apiWeather";
-import { useNavigation } from "@react-navigation/native";
 
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
@@ -36,6 +36,7 @@ const Home_screen = (props) => {
   const [isVisible, setIsVisible] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
   const [imageFovirite, setImageFavorite] = useState(
     require("../image/heart_one.png")
@@ -50,7 +51,13 @@ const Home_screen = (props) => {
     "Friday",
     "Saturday",
   ];
-
+useFocusEffect(
+    React.useCallback(() => {
+      console.log("Màn hình home, đang cập nhật dữ liệu...");
+      loadData();
+      setRefresh(!refresh);
+    }, [])
+  );
   useEffect(() => {
     console.log("Đang chạy getStoredUsername");
     const getStoredUsername = async () => {
@@ -166,10 +173,8 @@ const Home_screen = (props) => {
 
     return () => clearInterval(timer);
   }, []);
-  // Lấy dữ liệu từ api
-  useEffect(() => {
+  const loadData = async () => {
     console.log("Đang chạy fetchWeatherForecast");
-
     fetchWeatherForecast(!!locationAddressFr ? locationAddressFr : address)
       .then((data) => {
         setWeatherDataForecast(data);
@@ -177,6 +182,10 @@ const Home_screen = (props) => {
       .catch((error) => {
         openModal();
       });
+  }
+  // Lấy dữ liệu từ api
+  useEffect(() => {
+    loadData();
   }, [address, locationAddressFr]);
 
   // Xác nhận xóa
