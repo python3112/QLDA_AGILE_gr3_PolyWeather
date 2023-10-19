@@ -4,6 +4,7 @@ import firebase from '../db/firebase';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { get, getDatabase, ref, query, equalTo, orderByChild, update } from 'firebase/database';
 
@@ -20,6 +21,8 @@ const Setting = (props) => {
   const [showPass, setShowPass] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [newPass, setnewPass] = useState('');
+  const [rePass, setrePass] = useState('');
+  const [checkNewPass, setcheckNewPass] = useState(false);
 
 
   const fetchUserData = async () => {
@@ -84,18 +87,28 @@ const Setting = (props) => {
       userStatus: true,
     }
     updateData(idUser, newData)
-      setModalVip(false);
-    
+    setModalVip(false);
+
   }
 
-  const updatePass = (pass) => {
-    console.log('updatevip')
+  const updatePass = (pass, repass) => {
+    console.log('updatePass')
     const idUser = Object.keys(dataUserSetting)[0];
-    const newData = {
-      password:pass,
+    if (pass.length > 0 || repass.length > 0) {
+      if (pass === repass) {
+        const newData = {
+          password: pass,
+        }
+        setcheckNewPass(false);
+       
+         updateData(idUser, newData)
+      } else {
+        setcheckNewPass(true);
+      }
+    } else {
+        setcheckNewPass(true);
     }
-   updateData(idUser, newData)
-    closeModalPass()
+
   }
 
   const closeModalVip = () => {
@@ -105,7 +118,7 @@ const Setting = (props) => {
   const closeModalPass = () => {
     setModalPass(false);
   }
- 
+
 
   return (
     <SafeAreaView>
@@ -357,9 +370,9 @@ const Setting = (props) => {
               onRequestClose={closeModalPass}
             >
               <View
-                style={{ flex: 1, justifyContent: 'center', alignItems: 'center'  , backgroundColor: "rgba(0, 0, 0, 0.5)"}}
+                style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(0, 0, 0, 0.5)" }}
               >
-                <View style={{ width: '90%'  , backgroundColor:'white'  , borderRadius:10 , paddingBottom:10 }}>
+                <View style={{ width: '90%', backgroundColor: 'white', borderRadius: 10, paddingBottom: 10 }}>
                   <View
                     style={styles.headerModal}
                   >
@@ -375,9 +388,9 @@ const Setting = (props) => {
                       Thay đổi mật khẩu tài khoản
                     </Text>
                   </View>
-                   {/* //////////////////body.////////// */}
+                  {/* //////////////////body.////////// */}
                   <View
-                    style={{width:'100%', backgroundColor:'white' , alignItems:'center' }}
+                    style={{ width: '100%', backgroundColor: 'white', alignItems: 'center' }}
                   >
                     <View style={styles.viewInPut}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -413,20 +426,32 @@ const Setting = (props) => {
                         />
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.viewInPut}>
+                    <View style={{
+                      flexDirection: "row",
+                      width: "95%",
+                      justifyContent: 'space-between',
+                      height: 60,
+                      alignItems: "center",
+                      paddingStart: 10,
+                      marginTop: 15,
+                      borderRadius: 10,
+                      borderColor: checkNewPass ? 'red' : "orange",
+                      borderWidth: 1.5,
+                      marginBottom: 10
+                    }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <FontAwesome5
-                          name="lock"
+                        <AntDesign
+                          name={checkNewPass ? 'warning' : "edit"}
                           size={20}
                           color="orange"
                           style={{ marginEnd: 10 }}
                         />
                         <TextInput
-                          onChangeText={(text) =>setnewPass(text)}
+                          onChangeText={(text) => setnewPass(text)}
                           style={styles.tipPassword}
                           placeholder=" newpassword"
                           secureTextEntry={showPass ? false : true}
-                        
+
                         />
                       </View>
                       <TouchableOpacity
@@ -445,19 +470,32 @@ const Setting = (props) => {
                       </TouchableOpacity>
                     </View>
 
-                    <View style={styles.viewInPut}>
+                    <View style={{
+                      flexDirection: "row",
+                      width: "95%",
+                      justifyContent: 'space-between',
+                      height: 60,
+                      alignItems: "center",
+                      paddingStart: 10,
+                      marginTop: 15,
+                      borderRadius: 10,
+                      borderColor: checkNewPass ? 'red' : "orange",
+                      borderWidth: 1.5,
+                      marginBottom: 10
+                    }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <FontAwesome5
-                          name="lock"
+                        <AntDesign
+                          name={checkNewPass ? 'warning' : "edit"}
                           size={20}
                           color="orange"
                           style={{ marginEnd: 10 }}
                         />
                         <TextInput
+                        onChangeText={(text) => {setrePass(text)}}
                           style={styles.tipPassword}
                           placeholder="Repassword"
                           secureTextEntry={showPass ? false : true}
-                          
+
                         />
                       </View>
                       <TouchableOpacity
@@ -477,7 +515,7 @@ const Setting = (props) => {
                     </View>
                   </View>
 
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 5  }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 5 }}>
                     <TouchableOpacity
                       onPress={() => { closeModalPass() }}
                       style={styles.btnModal}
@@ -486,7 +524,7 @@ const Setting = (props) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        onPress={()=>{updatePass(newPass)}}
+                      onPress={() => { updatePass(newPass, rePass) }}
                       style={styles.btnModal}
                     >
                       <Text style={{ textAlign: "center" }}>Change</Text>
@@ -547,7 +585,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    
+
   },
   viewModal: {
     width: "80%",
@@ -555,7 +593,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     elevation: 10,
-    paddingBottom:10,
+    paddingBottom: 10,
   },
   headerModal: {
     backgroundColor: '#FFA500',
@@ -587,13 +625,13 @@ const styles = StyleSheet.create({
     marginEnd: 10,
     borderWidth: 1,
     width: 80,
-    padding:8
+    padding: 8
   },
 
   viewInPut: {
     flexDirection: "row",
     width: "95%",
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     height: 60,
     alignItems: "center",
     paddingStart: 10,
@@ -601,12 +639,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "orange",
     borderWidth: 1.5,
-    marginBottom:10
+    marginBottom: 10
   },
-  tipPassword:{
-    maxWidth:'80%',
-    color:'black',
-    fontSize:17,
-    marginStart:10
+  tipPassword: {
+    maxWidth: '80%',
+    color: 'black',
+    fontSize: 17,
+    marginStart: 10
   },
 })
