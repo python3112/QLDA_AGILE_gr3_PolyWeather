@@ -21,24 +21,21 @@ import {
   checkIfLocationExists,
 } from "../db/favorite";
 import {
-  getStoredUsername,
   getHourlyForecast,
   calculateSunMoon,
   getImagePath,
 } from "../utilities/utilities";
 import { FlatList } from "react-native-gesture-handler";
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 
-const Home_screen = ({route}) => {
-  const { locationAddressYT } = route.params || {};
+const Home_screen = ({ route }) => {
+  const { userNameLogin, locationAddressFr } = route.params;
   const [searchAddress, setSearchAddress] = useState(null);
   const _ = require("lodash");
-  const [userNameLogin, setUserNameLogin] = useState(null);
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
   const [isVisibleYT, setIsVisibleYT] = useState(false);
-  const [refresh, setRefresh] = useState(false);
   const [locationNow, setLocationNow] = useState(null);
   const [srcImage, setSrcImage] = useState(require("../image/cloudy.jpg"));
   const [currentDateTime, setCurrentDateTime] = useState(
@@ -56,24 +53,38 @@ const Home_screen = ({route}) => {
     "Friday",
     "Saturday",
   ];
-
+  // Cập nhập trạng thái icon yêu thích sau khi quay lại màn hình
+  useFocusEffect(
+    useCallback(() => {
+      setSearchAddress("");
+      checkIfLocationExists(
+        userNameLogin,
+        weatherDataForecast,
+        setImageFavorite,
+        setCheckFavorite
+      );
+    }, [])
+  );
+  // Lấy địa điểm hiện tại
   useEffect(() => {
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         return;
       }
       let location = null;
       try {
         location = await Location.getCurrentPositionAsync({});
         if (location) {
-          setLocationNow(`${location.coords.latitude},${location.coords.longitude}`);
+          setLocationNow(
+            `${location.coords.latitude},${location.coords.longitude}`
+          );
         }
       } catch (error) {
         console.log("Error getting location: ", error);
       }
       if (!location) {
-        setTimeout(getLocation, 300);
+        setTimeout(getLocation, 100);
       }
     };
     getLocation();
@@ -85,19 +96,14 @@ const Home_screen = ({route}) => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // Lấy ra username đăng nhập
+  // Tải dữ liệu
   useEffect(() => {
-    getStoredUsername(setUserNameLogin);
-  }, []);
-
-  useEffect(() => {
-    if (locationAddressYT != undefined) {
+    if (locationAddressFr != undefined) {
       loadDataYT();
     } else {
       loadData();
     }
-  }, [refresh,locationNow]);
+  }, [locationNow, locationAddressFr]);
 
   // Render thông tin thời tiết hàng giờ
   const filteredHourlyForecast = getHourlyForecast(weatherDataForecast);
@@ -144,6 +150,7 @@ const Home_screen = ({route}) => {
   };
   // Tải dữ liệu thời tiết từ API theo vị trí hiện tại
   const loadData = async () => {
+    console.log("loadData");
     fetchWeatherForecast(locationNow)
       .then((data) => {
         setWeatherDataForecast(data);
@@ -154,7 +161,8 @@ const Home_screen = ({route}) => {
   };
   // Tải dữ liệu thời tiết từ API theo vị trí yêu thích
   const loadDataYT = async () => {
-    fetchWeatherForecast(locationAddressYT)
+    console.log("loadDataYT");
+    fetchWeatherForecast(locationAddressFr)
       .then((data) => {
         setWeatherDataForecast(data);
       })
@@ -748,6 +756,9 @@ const Home_screen = ({route}) => {
           }}
         >
           <ActivityIndicator size="large" color="orange" />
+          <Text style={{ fontSize: 16, textAlign: "center", marginTop: 10 }}>
+            Loading...
+          </Text>
         </View>
       )}
     </View>

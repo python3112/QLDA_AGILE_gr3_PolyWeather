@@ -1,19 +1,30 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TouchableOpacityBase } from 'react-native';
-import LoginScreen from './All/views/Login_user';
-import Splash_screen from './All/views/Splash_screen';
-import SignupScreen from './All/views/Signup_user';
-import Home_screen from './All/views/Home_screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { DrawerItemList, createDrawerNavigator, DrawerContentScrollView } from '@react-navigation/drawer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useEffect } from 'react'
-import Setting from './All/views/Setting';
-import Favorite_address_screen from './All/views/Favorite_address_screen';
-
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StatusBar } from "expo-status-bar";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  TouchableOpacityBase,
+} from "react-native";
+import LoginScreen from "./All/views/Login_user";
+import Splash_screen from "./All/views/Splash_screen";
+import SignupScreen from "./All/views/Signup_user";
+import Home_screen from "./All/views/Home_screen";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import {
+  DrawerItemList,
+  createDrawerNavigator,
+  DrawerContentScrollView,
+} from "@react-navigation/drawer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect } from "react";
+import Setting from "./All/views/Setting";
+import Favorite_address_screen from "./All/views/Favorite_address_screen";
 
 const CustomHeader = () => {
   const [Data, setData] = useState({});
@@ -30,55 +41,61 @@ const CustomHeader = () => {
     //   }
     // });
     const getdata = async () => {
-      await AsyncStorage.getItem('Data_User', (error, result) => {
+      await AsyncStorage.getItem("Data_User", (error, result) => {
         if (!error) {
           const user = JSON.parse(result);
           setData(user);
-
         } else {
           console.log("Error reading data from AsyncStorage: " + error);
         }
       });
-    }
+    };
 
-    getdata()
-
+    getdata();
   }, []);
-
 
   return (
     <View
       style={{
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,165,0 , 0.5)'
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(255,165,0 , 0.5)",
+      }}
+    >
+      <Image
+        style={{ width: 100, height: 100, borderRadius: 50, marginTop: "10%" }}
+        source={require("./All/image/man.png")}
+      ></Image>
 
-      }}>
-      <Image style={{ width: 100, height: 100, borderRadius: 50, marginTop: '10%' }} source={require('./All/image/man.png')}>
-
-      </Image>
-
-      <View style={{ flexDirection: 'row', marginBottom: '5%' }}>
+      <View style={{ flexDirection: "row", marginBottom: "5%" }}>
         <Text
-          style={{ fontSize: 20, color: 'rgba(255, 255, 255 , 1)', marginTop: 20, fontWeight: 'bold' }}>{Data == null ? 'User ' : Data.userFullName
-          }</Text>
+          style={{
+            fontSize: 20,
+            color: "rgba(255, 255, 255 , 1)",
+            marginTop: 20,
+            fontWeight: "bold",
+          }}
+        >
+          {Data == null ? "User " : Data.userFullName}
+        </Text>
         <Text
-          style={{ fontSize: 12, color: 'rgba(255, 0, 0 , 0.9)', marginTop: 20 }}>{Data.userStatus == false ? ' Normal' : ' Vip'
-          }</Text>
+          style={{
+            fontSize: 12,
+            color: "rgba(255, 0, 0 , 0.9)",
+            marginTop: 20,
+          }}
+        >
+          {Data.userStatus == false ? " Normal" : " Vip"}
+        </Text>
       </View>
 
-
-      <View style={{ backgroundColor: 'black', height: 1, width: '100%' }}>
-
-      </View>
-    </View >
-
-
-  )
+      <View
+        style={{ backgroundColor: "black", height: 1, width: "100%" }}
+      ></View>
+    </View>
+  );
 };
-
-
 
 const Drawer = createDrawerNavigator();
 
@@ -93,56 +110,60 @@ const CustomDrawerContent = (props) => {
     navigation.replace("login");
   };
   return (
-
-    <View style={{ height: '100%', }}>
+    <View style={{ height: "100%" }}>
       <CustomHeader />
       <View style={{ flex: 1 }}>
         <DrawerContentScrollView contentContainerStyle={{}} {...props}>
-
           <DrawerItemList {...props} />
-
         </DrawerContentScrollView>
       </View>
-      <View style={{ marginBottom: '5%' }}>
+      <View style={{ marginBottom: "5%" }}>
         <TouchableOpacity
           style={{
-            width: '90%',
+            width: "90%",
             paddingVertical: 15,
-            marginStart: '5%',
-            borderColor: 'rgb(255, 0, 0)',
+            marginStart: "5%",
+            borderColor: "rgb(255, 0, 0)",
             borderWidth: 1.5,
             borderRadius: 10,
-
           }}
           onPress={handleLogout}
-
-
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <AntDesign name="logout" size={23} color='black' />
-            <Text style={{ color: 'black', fontWeight: 'bold', marginStart: 10 }}>Sign Out</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <AntDesign name="logout" size={23} color="black" />
+            <Text
+              style={{ color: "black", fontWeight: "bold", marginStart: 10 }}
+            >
+              Sign Out
+            </Text>
           </View>
-
         </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 };
 
 const DrawerNav = (props) => {
-  const {route } = props;
+  const { route } = props;
   const { userNameLogin } = route.params || {};
   return (
     <Drawer.Navigator
       screenOptions={{
-        drawerActiveBackgroundColor: '#FFA500',
-        drawerActiveTintColor: 'white'
+        drawerActiveBackgroundColor: "#FFA500",
+        drawerActiveTintColor: "white",
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
         name="homeA"
         component={Home_screen}
+        initialParams={{ userNameLogin: userNameLogin}}
         options={{
           drawerLabel: "Home",
           title: "Home",
@@ -154,7 +175,7 @@ const DrawerNav = (props) => {
       <Drawer.Screen
         name="Favorite"
         component={Favorite_address_screen}
-        initialParams={{userNameLogin:userNameLogin}}
+        initialParams={{ userNameLogin: userNameLogin }}
         options={{
           drawerLabel: "Favorite address",
           title: "Favorite address",
@@ -175,10 +196,9 @@ const DrawerNav = (props) => {
           ),
         }}
       />
-
     </Drawer.Navigator>
   );
-}
+};
 
 const Stack = createNativeStackNavigator();
 

@@ -19,7 +19,7 @@ import { styles } from "../css/styleFavorite";
 import { getStoredUsername } from "../utilities/utilities";
 
 const Favorite_address_screen = (props) => {
-  const { navigation,route } = props;
+  const { navigation, route } = props;
   const { userNameLogin } = route.params;
   const _ = require("lodash");
   const [favoriteLocations, setFavoriteLocations] = useState([]);
@@ -32,7 +32,7 @@ const Favorite_address_screen = (props) => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    },[])
+    }, [])
   );
 
   useEffect(() => {
@@ -196,6 +196,9 @@ const Favorite_address_screen = (props) => {
       throw error;
     }
   };
+  const nextScreen = (address) => {
+    navigation.navigate('homeA',{locationAddressFr: address});
+  };
   // Mở đóng modal yêu thích
   const openModalYT = (address) => {
     setAddressYT(address);
@@ -246,11 +249,7 @@ const Favorite_address_screen = (props) => {
                 >
                   <TouchableOpacity
                     style={styles.topLeft}
-                    onPress={() =>
-                      navigation.navigate("homeA", {
-                        locationAddressYT: item.locationAddress,
-                      })
-                    }
+                    onPress={() => nextScreen(item.locationAddress)}
                   >
                     <Text style={styles.textTopLeft}>
                       {item.locationAddress}
@@ -303,7 +302,7 @@ const Favorite_address_screen = (props) => {
       ) : (
         <View style={styles.centeredView}>
           <Image
-            source={require("../image/smile.png")} // Thay đổi đường dẫn đến hình ảnh của bạn
+            source={require("../image/smile.png")}
             style={styles.imageStyle}
           />
           <Text style={styles.noFavoriteText}>
