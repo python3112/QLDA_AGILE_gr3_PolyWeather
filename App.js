@@ -129,7 +129,9 @@ const CustomDrawerContent = (props) => {
   )
 };
 
-function DrawerNav() {
+const DrawerNav = (props) => {
+  const {route } = props;
+  const { userNameLogin } = route.params || {};
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -152,6 +154,7 @@ function DrawerNav() {
       <Drawer.Screen
         name="Favorite"
         component={Favorite_address_screen}
+        initialParams={{userNameLogin:userNameLogin}}
         options={{
           drawerLabel: "Favorite address",
           title: "Favorite address",

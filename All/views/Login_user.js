@@ -16,31 +16,14 @@ import firebase from "../db/firebase";
 import { getDatabase, ref, get } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import * as Location from 'expo-location';
-import axios from 'axios';
 
-const GEOCODING_API_KEY = 'AIzaSyD-pYfVBDIJcDZwHdAQksogXm78sP7Kb3Y';
 const LoginScreen = (props) => {
 const{navigation } = props;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [textErr, settextErr] = useState("");
-  const [UserLogin, setUserLogin] = useState(null);
-  const [save, setsave] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [addressNow, setAddressNow] = useState(null);
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setAddressNow(`${location.coords.latitude},${location.coords.longitude}`);
-    })();
-  }, [addressNow]);
+  
 
   
 
@@ -56,23 +39,12 @@ const{navigation } = props;
   //Kết nối firebase
   useEffect(() => {
     firebase();
-    // async () =>{
-    //   if(save){
-    //      Save_Data_User(User);
-    //     console.log('user được lưu : ' +  UserLogin)
-    //     setsave(false); 
-    //  }
-    // }
-
-
-
   }, []);
 
 
 
   //Check đăng nhập
   const checkLogin = async () => {
-    setAddressNow('Hải Phòng');
     const db = getDatabase();
     const userRef = ref(db, "users");
 
@@ -94,11 +66,11 @@ const{navigation } = props;
               try {
                 const jsonValue = JSON.stringify(user);
                 AsyncStorage.setItem('Data_User', jsonValue)
-
               } catch (e) {
                 console.log("lưu data lỗi :" + e)
               }
-              navigation.replace("home",{locationNow: addressNow});
+              navigation.replace('home',{userNameLogin:username});
+
               //Mật khẩu sai => In ra thông báo
             } else {
               setIsVisible(true);
@@ -117,17 +89,6 @@ const{navigation } = props;
         console.error("Error reading data: ", error);
       });
   };
-
-  const Save_Data_User = async (user_Login) => {
-    try {
-      const jsonValue = JSON.stringify(user_Login);
-      await AsyncStorage.setItem('Data_User', jsonValue)
-
-    } catch (e) {
-      console.log("lưu data lỗi :" + e)
-    }
-
-  }
   return (
     <View style={styles.container}>
       {/* Phần logo */}
