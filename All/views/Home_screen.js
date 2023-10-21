@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
-import { fetchWeatherForecast, fetchWeatherForecastNow } from "../db/apiWeather";
+import { fetchWeatherForecast } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
 import {
@@ -65,52 +65,31 @@ const Home_screen = ({ route }) => {
     }, [])
   );
   // Tải vị trí hiện tại
-  const getLocationNow = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      return;
-    }
-      try {
-        let location = await Location.getCurrentPositionAsync({});
-        if (location) {
-          console.log("Đang tải vị trí");
-          return(
-            `${location.coords.latitude},${location.coords.longitude}`
-          );
-        }
-      } catch (error) {
-        console.log("Error getting location: ", error);
+  
+  const getLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        return;
       }
+      let location = await Location.getCurrentPositionAsync({});
+      if (location) {
+        console.log("Đang tải vị trí");
+        setLocationNow(
+          `${location.coords.latitude},${location.coords.longitude}`
+        );
+      }
+    } catch (error) {
+      console.log("Error getting location: ", error);
     }
+  };
+
+  // Tải vị trí hiện tại
   useEffect(() => {
-    if(locationNow ==null || locationNow==undefined){
-      const getLocation = async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          return;
-        }
-        let location = null;
-        let isLocationLoaded = false;
-        while (!isLocationLoaded) {
-          try {
-            location = await Location.getCurrentPositionAsync({});
-            if (location) {
-              console.log("Đang tải vị trí");
-              setLocationNow(
-                `${location.coords.latitude},${location.coords.longitude}`
-              );
-              isLocationLoaded = true;
-            }
-          } catch (error) {
-            console.log("Error getting location: ", error);
-          }
-        }
-      };
+    if (!locationNow) {
       getLocation();
-    }else{
-      return;
     }
-  }, []);
+  }, [locationNow]);
   // Lấy ngày hiện tại
   useEffect(() => {
     const timer = setInterval(() => {
@@ -173,7 +152,7 @@ const Home_screen = ({ route }) => {
   // Tải dữ liệu thời tiết từ API theo vị trí hiện tại
   const loadData = async () => {
     console.log("loadData");
-    fetchWeatherForecastNow(locationNow,getLocationNow)
+    fetchWeatherForecast(locationNow)
       .then((data) => {
         setWeatherDataForecast(data);
       })

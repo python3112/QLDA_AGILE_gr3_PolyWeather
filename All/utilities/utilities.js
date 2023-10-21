@@ -2,12 +2,7 @@ import moment from "moment";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, get } from "firebase/database";
 
-export const checkLogin = async (username, password, setIsVisible, settextErr, navigation,addressNow,getLocation) => {
-  if(!addressNow){
-    console.log("Địa chỉ null");
-    getLocation();
-    return;
-  }
+export const checkLogin = async (username, password, setIsVisible, settextErr, navigation) => {
   try {
     const db = getDatabase();
     
@@ -30,7 +25,7 @@ export const checkLogin = async (username, password, setIsVisible, settextErr, n
           } catch (e) {
             console.log("lưu data lỗi :" + e);
           }
-          navigation.replace('home', { userNameLogin: username,addressNow: addressNow });
+          navigation.replace('home', { userNameLogin: username});
         } else {
           setIsVisible(true);
           settextErr('Wrong password !');
