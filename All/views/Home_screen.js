@@ -27,8 +27,8 @@ import {
 } from "../utilities/utilities";
 import { FlatList } from "react-native-gesture-handler";
 import * as Location from "expo-location";
-const Home_screen = ({ route }) => {
-  const { userNameLogin, locationAddressFr,addressNow } = route.params;
+const Home_screen = ({ route, navigation }) => {
+  const { userNameLogin, locationAddressFr, addressNow } = route.params;
   const [locationNow, setLocationNow] = useState(addressNow);
   const [searchAddress, setSearchAddress] = useState(null);
   const _ = require("lodash");
@@ -65,7 +65,6 @@ const Home_screen = ({ route }) => {
     }, [])
   );
   // Tải vị trí hiện tại
-  
   const getLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -102,7 +101,11 @@ const Home_screen = ({ route }) => {
     if (locationAddressFr != undefined) {
       loadDataYT();
     } else {
-      loadData();
+      if (locationNow) {
+        loadData();
+      } else {
+        getLocation();
+      }
     }
   }, [locationNow, locationAddressFr]);
 
@@ -481,8 +484,11 @@ const Home_screen = ({ route }) => {
                 padding: 10,
                 borderRadius: 5,
               }}
+              
             >
+              <TouchableOpacity onPress={()=>navigation.navigate('hourly',{data:filteredHourlyForecast})}>
               <Text style={{ fontSize: 17, fontWeight: "500" }}>Hourly</Text>
+              </TouchableOpacity>
               <View
                 style={{
                   width: "100%",

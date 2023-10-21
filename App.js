@@ -24,7 +24,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect } from "react";
 import Setting from "./All/views/Setting";
 import Favorite_address_screen from "./All/views/Favorite_address_screen";
-
+import Hourly_screen from "./All/views/Hourly_screen";
 const CustomHeader = () => {
   const [Data, setData] = useState({});
 
@@ -220,6 +220,11 @@ export default function App() {
         <Stack.Screen
           name="favorite"
           component={Favorite_address_screen}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="hourly"
+          component={Hourly_screen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
