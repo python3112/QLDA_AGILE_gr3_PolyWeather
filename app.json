@@ -21,16 +21,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.chudinhhieu.PolyWeather"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "7bee3cb2-916a-47a8-8d59-9f5fc6533ab6"
-      }
-    },"scheme":"PolyWeather"
+    }
   }
 }
