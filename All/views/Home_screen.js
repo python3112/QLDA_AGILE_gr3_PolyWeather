@@ -522,7 +522,7 @@ const Home_screen = ({ route, navigation }) => {
                 {weatherDataForecast?.forecast?.forecastday
                   ?.slice(0, 3)
                   .map((day, index) => (
-                    <View key={index} style={styles.forecastBox}>
+                    <TouchableOpacity key={index} style={styles.forecastBox} onPress={()=>navigation.navigate('daily',{data:day,date:daysOfWeek[new Date(day.date).getDay()]})}>
                       <Text style={styles.forecastDay}>
                         {daysOfWeek[new Date(day.date).getDay()]}
                       </Text>
@@ -536,7 +536,7 @@ const Home_screen = ({ route, navigation }) => {
                       <Text style={styles.forecastTextMin}>
                         {day.day["mintemp_c"] + "°"}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   ))}
               </View>
             </View>

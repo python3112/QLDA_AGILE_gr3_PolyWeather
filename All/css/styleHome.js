@@ -243,4 +243,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 5,
   },
+  containerSunMoon:{
+    flexDirection: "row",
+    borderColor: "grey",
+    borderTopWidth: 0.5,
+    paddingVertical: 10,
+    justifyContent: "space-between",
+  }
 });

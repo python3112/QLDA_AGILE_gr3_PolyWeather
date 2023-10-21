@@ -18,7 +18,7 @@ const Hourly_screen = ({ route, navigation }) => {
           alignItems: "flex-end",
         }}
       >
-        <TouchableOpacity onPress={() => navigation.replace("home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("home")}>
           <FontAwesome5 name="arrow-left" size={25} color="black" />
         </TouchableOpacity>
         <Text style={{ marginStart: 20, fontSize: 20, fontWeight: "500" }}>
@@ -64,7 +64,7 @@ const Hourly_screen = ({ route, navigation }) => {
                   {item.temp_c}°C
                 </Text>
                 <Text style={{ fontSize: 20, color: "#33CCFF" }}>
-                  {item.will_it_rain}%
+                  {item.chance_of_rain}%
                 </Text>
               </View>
               <View style={{ width: "70%" }}>
@@ -87,4 +87,4 @@ const Hourly_screen = ({ route, navigation }) => {
 
 export default Hourly_screen;
 
-const styles = StyleSheet.create({});
+
