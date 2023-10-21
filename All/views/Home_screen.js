@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import "react-native-gesture-handler";
 import moment from "moment";
-import { fetchWeatherForecast } from "../db/apiWeather";
+import { fetchWeatherForecast, fetchWeatherForecastNow } from "../db/apiWeather";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { styles } from "../css/styleHome";
 import {
@@ -65,6 +65,23 @@ const Home_screen = ({ route }) => {
     }, [])
   );
   // Tải vị trí hiện tại
+  const getLocationNow = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      return;
+    }
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          console.log("Đang tải vị trí");
+          return(
+            `${location.coords.latitude},${location.coords.longitude}`
+          );
+        }
+      } catch (error) {
+        console.log("Error getting location: ", error);
+      }
+    }
   useEffect(() => {
     if(locationNow ==null || locationNow==undefined){
       const getLocation = async () => {
@@ -156,7 +173,7 @@ const Home_screen = ({ route }) => {
   // Tải dữ liệu thời tiết từ API theo vị trí hiện tại
   const loadData = async () => {
     console.log("loadData");
-    fetchWeatherForecast(locationNow)
+    fetchWeatherForecastNow(locationNow,getLocationNow)
       .then((data) => {
         setWeatherDataForecast(data);
       })

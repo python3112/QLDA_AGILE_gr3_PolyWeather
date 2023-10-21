@@ -6,9 +6,11 @@ export const checkLogin = async (username, password, setIsVisible, settextErr, n
   if(!addressNow){
     console.log("Địa chỉ null");
     getLocation();
+    return;
   }
   try {
     const db = getDatabase();
+    
     const userRef = ref(db, "users");
 
     const snapshot = await get(userRef);

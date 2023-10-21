@@ -6,13 +6,27 @@ import {
   Image,
   TextInput,
   Modal,
+  ActivityIndicator
 } from "react-native";
+import "react-native-gesture-handler";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import firebase from "../db/firebase";
 import { styles } from "../css/styleLogin";
 import { checkLogin } from "../utilities/utilities";
 import * as Location from "expo-location";
+
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+} from "firebase/auth";
+import { auth } from "../db/firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+WebBrowser.maybeCompleteAuthSession();
 const LoginScreen = (props) => {
 const{navigation } = props;
   const [username, setUsername] = useState("");
@@ -25,7 +39,21 @@ const{navigation } = props;
   const closeModal = () => {
     setIsVisible(false);
   };
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: "319387099135-8m53iimevr7ac1vhb269dhqekn6snvic.apps.googleusercontent.com",
+  });
 
+ 
+
+  React.useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential);
+    }
+  }, [response]);
+
+ 
   //Kết nối firebase
   useEffect(() => {
     firebase();
@@ -186,7 +214,7 @@ const{navigation } = props;
 
         {/* Đăng nhặp bằng Google */}
         <View style={styles.loginWithOtherAccount}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>promptAsync()}>
             <View style={{backgroundColor:'white',height:55,flexDirection:"row",alignItems:'center',borderRadius:5,borderWidth:1.5}}>
             <View style={{marginStart:10,width:"24%"}}>
             <Image style={styles.logoOthers} source={require("../image/logoGG.png")}/>
