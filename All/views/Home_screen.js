@@ -28,8 +28,8 @@ import {
 import { FlatList } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 const Home_screen = ({ route }) => {
-  const { userNameLogin, locationAddressFr } = route.params;
-  const [locationNow, setLocationNow] = useState(null);
+  const { userNameLogin, locationAddressFr,addressNow } = route.params;
+  const [locationNow, setLocationNow] = useState(addressNow);
   const [searchAddress, setSearchAddress] = useState(null);
   const _ = require("lodash");
   const [weatherDataForecast, setWeatherDataForecast] = useState(null);
@@ -64,30 +64,35 @@ const Home_screen = ({ route }) => {
       );
     }, [])
   );
+  // Tải vị trí hiện tại
   useEffect(() => {
-    const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        return;
-      }
-      let location = null;
-      let isLocationLoaded = false;
-      while (!isLocationLoaded) {
-        try {
-          location = await Location.getCurrentPositionAsync({});
-          if (location) {
-            console.log("Đang tải vị trí");
-            setLocationNow(
-              `${location.coords.latitude},${location.coords.longitude}`
-            );
-            isLocationLoaded = true;
-          }
-        } catch (error) {
-          console.log("Error getting location: ", error);
+    if(locationNow ==null || locationNow==undefined){
+      const getLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          return;
         }
-      }
-    };
-    getLocation();
+        let location = null;
+        let isLocationLoaded = false;
+        while (!isLocationLoaded) {
+          try {
+            location = await Location.getCurrentPositionAsync({});
+            if (location) {
+              console.log("Đang tải vị trí");
+              setLocationNow(
+                `${location.coords.latitude},${location.coords.longitude}`
+              );
+              isLocationLoaded = true;
+            }
+          } catch (error) {
+            console.log("Error getting location: ", error);
+          }
+        }
+      };
+      getLocation();
+    }else{
+      return;
+    }
   }, []);
   // Lấy ngày hiện tại
   useEffect(() => {
@@ -150,14 +155,14 @@ const Home_screen = ({ route }) => {
   };
   // Tải dữ liệu thời tiết từ API theo vị trí hiện tại
   const loadData = async () => {
-      console.log("loadData");
-      fetchWeatherForecast(locationNow)
-        .then((data) => {
-          setWeatherDataForecast(data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    console.log("loadData");
+    fetchWeatherForecast(locationNow)
+      .then((data) => {
+        setWeatherDataForecast(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   // Tải dữ liệu thời tiết từ API theo vị trí yêu thích
   const loadDataYT = async () => {

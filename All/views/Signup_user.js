@@ -343,20 +343,20 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   logo: {
-    position: "relative",
-    top: 50,
     alignItems: "center",
+    minHeight:'20%',
+    maxHeight:'20%',
+    marginBottom:80
   },
   body: {
     width: "93%",
-    position: "relative",
-    top: 80,
+    minHeight:'50%',
     alignItems: "center",
   },
   //Logo
   imageLogo: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
   },
   textLogo: {
     marginTop: 10,
@@ -429,8 +429,7 @@ const styles = StyleSheet.create({
 
 
   containerSignUp: {
-    position: 'absolute',
-    bottom: 20,
+    minHeight:'5%',
     flexDirection: 'row',
     alignItems: 'center'
   },

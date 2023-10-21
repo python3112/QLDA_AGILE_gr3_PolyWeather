@@ -1,6 +1,9 @@
 import axios from 'axios';
 
 const fetchWeatherForecast = async (address) => {
+  if(address === null || address === undefined || address === '') {
+    address = 'Hanoi';
+  }
   const options = {
     method: 'GET',
     url: 'https://weatherapi-com.p.rapidapi.com/forecast.json',

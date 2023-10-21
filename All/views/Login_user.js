@@ -12,6 +12,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import firebase from "../db/firebase";
 import { styles } from "../css/styleLogin";
 import { checkLogin } from "../utilities/utilities";
+import * as Location from "expo-location";
 const LoginScreen = (props) => {
 const{navigation } = props;
   const [username, setUsername] = useState("");
@@ -29,7 +30,55 @@ const{navigation } = props;
   useEffect(() => {
     firebase();
   }, []);
-
+  const getLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      return;
+    }
+    let location = null;
+    let isLocationLoaded = false;
+    while (!isLocationLoaded) {
+      try {
+        location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          console.log("Đang tải vị trí");
+          setLocationNow(
+            `${location.coords.latitude},${location.coords.longitude}`
+          );
+          isLocationLoaded = true;
+        }
+      } catch (error) {
+        console.log("Error getting location: ", error);
+      }
+    }
+  };
+  const [locationNow, setLocationNow] = useState(null);
+  useEffect(() => {
+  const getLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      return;
+    }
+    let location = null;
+    let isLocationLoaded = false;
+    while (!isLocationLoaded) {
+      try {
+        location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          console.log("Đang tải vị trí");
+          setLocationNow(
+            `${location.coords.latitude},${location.coords.longitude}`
+          );
+          isLocationLoaded = true;
+        }
+      } catch (error) {
+        console.log("Error getting location: ", error);
+      }
+    }
+  };
+  getLocation();
+ 
+}, []);
 
 
   
@@ -131,7 +180,7 @@ const{navigation } = props;
         </Modal>
 
         {/* Button Login => Click => Chuyển sang màn hình Home */}
-        <TouchableOpacity style={styles.btnLogin} onPress={() => checkLogin(username, password, setIsVisible, settextErr, navigation)}>
+        <TouchableOpacity style={styles.btnLogin} onPress={() => checkLogin(username, password, setIsVisible, settextErr, navigation,locationNow,getLocation)}>
           <Text style={styles.textBtnLogin}>Sign in</Text>
         </TouchableOpacity>
 
